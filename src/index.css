@@ -1,0 +1,318 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Manrope:wght@400;500;600;700;800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* DDK Official Brand Colors - Revamped System */
+  --navy: #073F78;
+  --blue: #1266B1;
+  --sky: #EAF3FC;
+  --gold: #FFC928;
+  --gold-hover: #E8B41D;
+  --ink: #102A43;
+  --muted: #718096;
+  --line: #E4EBF2;
+  --white: #FFFFFF;
+  --bg: #F5F8FC;
+  --green: #168567;
+  --shadow: 0 12px 32px rgba(18, 56, 92, 0.08);
+
+  /* Legacy & Semantic Mapping */
+  --ddk-dark: #073F78;
+  --ddk-dark-deep: #052445;
+  --ddk-primary-blue: #1266B1;
+  --ddk-blue: #1674BD;
+  --ddk-soft-blue: #EAF3FC;
+  --ddk-mid-gray: #E4EBF2;
+  --ddk-light-gray: #F5F8FC;
+  --ddk-white: #FFFFFF;
+  --ddk-gold: #FFC928;
+  --ddk-gold-hover: #E8B41D;
+  --ddk-gold-subtle: rgba(255, 201, 40, 0.18);
+  --ddk-blue-subtle: rgba(18, 102, 177, 0.08);
+
+  /* Typography */
+  --font-heading: 'Manrope', 'Poppins', sans-serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* UI Tokens */
+  --bg-primary: #F5F8FC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F9FBFD;
+  --bg-hero: linear-gradient(115deg, #073F78 0%, #1266B1 100%);
+  
+  --border-subtle: #E4EBF2;
+  --border-strong: #B8C7D9;
+
+  --text-primary: #073F78;
+  --text-body: #102A43;
+  --text-secondary: #53677C;
+  --text-muted: #718096;
+  --text-inverse: #FFFFFF;
+
+  --shadow-sm: 0 2px 6px rgba(18, 56, 92, 0.05);
+  --shadow-md: 0 8px 20px rgba(18, 56, 92, 0.08);
+  --shadow-lg: 0 12px 32px rgba(18, 56, 92, 0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headings use Poppins */
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+  color: var(--ddk-dark);
+  letter-spacing: -0.02em;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ddk-light-gray);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ddk-mid-gray);
+  border-radius: var(--radius-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ddk-blue);
+}
+
+/* DDK Cards */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--ddk-primary-blue);
+  box-shadow: var(--shadow-md);
+}
+
+/* DDK Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-heading);
+}
+
+.btn-primary {
+  background: var(--ddk-primary-blue);
+  color: var(--ddk-white);
+  box-shadow: 0 4px 10px rgba(15, 95, 168, 0.25);
+}
+.btn-primary:hover {
+  background: var(--ddk-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(12, 79, 142, 0.3);
+}
+
+.btn-gold {
+  background: var(--ddk-gold);
+  color: var(--ddk-dark-deep);
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(245, 200, 66, 0.35);
+}
+.btn-gold:hover {
+  background: var(--ddk-gold-hover);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: var(--ddk-white);
+  color: var(--ddk-dark);
+  border-color: var(--ddk-mid-gray);
+}
+.btn-outline:hover {
+  background: var(--ddk-light-gray);
+  border-color: var(--ddk-primary-blue);
+  color: var(--ddk-primary-blue);
+}
+
+/* DDK Badges & Pills */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+  font-family: var(--font-heading);
+}
+
+.badge-gold {
+  background: var(--ddk-gold-subtle);
+  color: #926C05;
+  border: 1px solid rgba(245, 200, 66, 0.4);
+}
+
+.badge-blue {
+  background: var(--ddk-blue-subtle);
+  color: var(--ddk-primary-blue);
+  border: 1px solid rgba(15, 95, 168, 0.25);
+}
+
+.badge-soft {
+  background: #E8F1FA;
+  color: var(--ddk-dark);
+  border: 1px solid var(--ddk-mid-gray);
+}
+
+/* Danny's Quote / Storytelling Callout Box */
+.ddk-quote-box {
+  background: linear-gradient(135deg, rgba(12, 79, 142, 0.04) 0%, rgba(245, 200, 66, 0.08) 100%);
+  border-left: 5px solid var(--ddk-gold);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.ddk-quote-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--ddk-dark);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.ddk-quote-text {
+  font-style: italic;
+  color: #334155;
+  font-size: 0.925rem;
+  line-height: 1.6;
+}
+
+/* DDK Revamp Design Tokens & Components */
+.orb {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  width: 190px;
+  height: 190px;
+  right: 24px;
+  top: -99px;
+  pointer-events: none;
+}
+.orb:after {
+  content: '';
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  width: 130px;
+  height: 130px;
+  left: 28px;
+  top: 28px;
+}
+
+.course-banner-navy {
+  background: linear-gradient(115deg, #073F78 0%, #1674BD 100%);
+}
+
+.course-banner-gold {
+  background: linear-gradient(115deg, #AF6A00 0%, #F0AE15 100%);
+}
+
+.focus-box {
+  background: #FFF9E4;
+  border: 1px solid #F2DF9D;
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.focus-bulb {
+  height: 36px;
+  width: 36px;
+  border-radius: 10px;
+  background: var(--gold);
+  color: var(--navy);
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(255, 201, 40, 0.3);
+}
+
+.num-pill {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--sky);
+  color: var(--blue);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: var(--font-heading);
+}
+
+.num-pill.done {
+  background: #E5F5EF;
+  color: var(--green);
+}
+
+.status-badge-done {
+  background: #E5F5EF;
+  color: var(--green);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.status-badge-next {
+  background: #EAF3FC;
+  color: var(--blue);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.status-badge-upnext {
+  background: #EEF2F6;
+  color: #718096;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
