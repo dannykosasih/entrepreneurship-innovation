@@ -94,4 +94,18 @@ describe('Neon Nights LMS regression', () => {
     for(const asset of ['fonts/Poppins-Bold.ttf','fonts/Inter.ttf','fonts/IBMPlexMono-Regular.ttf','images/workshop.jpg','images/coffee.jpg']) expect(existsSync(`public/neon/${asset}`)).toBe(true);
     expect(COURSES).toHaveLength(15);expect(COURSES.every(c=>c.driveFileId&&c.slides.length)).toBe(true);
   });
+
+  it('loads, persists and resets the Value Proposition Design matching tool', async () => {
+    const user=userEvent.setup();render(<App/>);
+    await user.click(nav('Explore & tools','VPD Proposisi Nilai'));
+    expect(screen.getByRole('heading',{level:1})).toHaveTextContent(/Kanvas Proposisi Nilai/);
+    await user.click(screen.getByRole('button',{name:'Muat contoh Kopi AJIB'}));
+    expect(screen.getByDisplayValue(/Profesional muda perkantoran urban/)).toBeInTheDocument();
+    expect(screen.getByText('100%')).toBeInTheDocument();
+    const stored=JSON.parse(localStorage.getItem('innoventures_vpd_canvas'));
+    expect(stored.jobs.length).toBe(3);
+    expect(stored.links.length).toBeGreaterThan(0);
+    await user.click(screen.getByRole('button',{name:'Reset kanvas'}));
+    expect(JSON.parse(localStorage.getItem('innoventures_vpd_canvas')).jobs).toEqual([]);
+  });
 });

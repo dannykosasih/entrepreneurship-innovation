@@ -1,8 +1,8 @@
 import React from 'react';
-import { LayoutDashboard, BookOpen, HelpCircle, GraduationCap, Briefcase, Rocket, LayoutGrid, Search, Library, Award } from 'lucide-react';
+import { LayoutDashboard, BookOpen, HelpCircle, GraduationCap, Briefcase, Rocket, LayoutGrid, Layers, Search, Library, Award } from 'lucide-react';
 const groups = [
   ['Learning space', [['dashboard','My dashboard',LayoutDashboard],['courses','My learning',BookOpen],['quizzes','Assignments',HelpCircle],['grades','Learning calendar & Grades',GraduationCap]]],
-  ['Explore & tools', [['case-studies','Case library',Briefcase],['simulator','Startup simulator',Rocket],['bmc-builder','BMC Strategy Tool',LayoutGrid],['knowledge-hub','Knowledge wiki',Search],['sources','Resources & Syllabus',Library]]],
+  ['Explore & tools', [['case-studies','Case library',Briefcase],['simulator','Startup simulator',Rocket],['bmc-builder','BMC Strategy Tool',LayoutGrid],['vpd-builder','VPD Proposisi Nilai',Layers],['knowledge-hub','Knowledge wiki',Search],['sources','Resources & Syllabus',Library]]],
 ];
 export function Sidebar({ activeTab, setActiveTab, onOpenCertificate, menuOpen }) {
   return <aside id="academy-navigation" className={`neon-sidebar ${menuOpen ? 'is-open' : ''}`}>

@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { 
-  LayoutGrid, 
-  Plus, 
-  Trash2, 
-  Download, 
-  FileText, 
-  Sparkles, 
-  CheckCircle2, 
-  Share2 
+import {
+  LayoutGrid,
+  Plus,
+  Trash2,
+  Download,
+  BookOpen,
+  Quote,
 } from 'lucide-react';
+import { BMC_BLOCKS, BMC_BLOCK_MAP, VALUE_LENSES, DFV_LENSES, BMC_REFERENCES } from '../data/bmcBlocksData';
 
 const PRESET_TEMPLATES = {
   kopiAjib: {
@@ -87,10 +86,53 @@ const PRESET_TEMPLATES = {
   }
 };
 
+const CANVAS_TITLES = {
+  keyPartners: '1. Key Partners · Mitra Utama',
+  keyActivities: '2. Key Activities · Aktivitas Utama',
+  keyResources: '6. Key Resources · Sumber Daya Utama',
+  valuePropositions: '3. Value Propositions · Proposisi Nilai',
+  customerRelationships: '4. Customer Relationships · Hubungan Pelanggan',
+  channels: '7. Channels · Saluran',
+  customerSegments: '5. Customer Segments · Segmen Pelanggan',
+  costStructure: '8. Cost Structure · Struktur Biaya',
+  revenueStreams: '9. Revenue Streams · Aliran Pendapatan',
+};
+
+const EMPTY_CANVAS = {
+  keyPartners: [],
+  keyActivities: [],
+  keyResources: [],
+  valuePropositions: [],
+  customerRelationships: [],
+  channels: [],
+  customerSegments: [],
+  costStructure: [],
+  revenueStreams: [],
+};
+
+function LensBadge({ lens, kind }) {
+  const data = kind === 'value' ? VALUE_LENSES[lens] : DFV_LENSES[lens];
+  if (!data) return null;
+  return (
+    <span className="badge" style={{
+      fontSize: '0.6rem',
+      padding: '0.12rem 0.4rem',
+      background: `${data.color}18`,
+      color: data.color,
+      border: `1px solid ${data.color}55`,
+      letterSpacing: '0.02em',
+    }}>
+      {kind === 'value' ? data.label : data.label}
+    </span>
+  );
+}
+
 export function BmcBuilder() {
   const [activeTemplate, setActiveTemplate] = useState('kopiAjib');
   const [canvasData, setCanvasData] = useState(PRESET_TEMPLATES.kopiAjib.canvas);
   const [newItemText, setNewItemText] = useState({});
+  const [selectedKey, setSelectedKey] = useState('valuePropositions');
+  const [openGuideKey, setOpenGuideKey] = useState('customerSegments');
 
   const handleAddItem = (blockKey) => {
     const text = newItemText[blockKey]?.trim();
@@ -112,17 +154,7 @@ export function BmcBuilder() {
   const handleLoadTemplate = (key) => {
     setActiveTemplate(key);
     if (key === 'blank') {
-      setCanvasData({
-        keyPartners: [],
-        keyActivities: [],
-        keyResources: [],
-        valuePropositions: [],
-        customerRelationships: [],
-        channels: [],
-        customerSegments: [],
-        costStructure: [],
-        revenueStreams: []
-      });
+      setCanvasData({ ...EMPTY_CANVAS });
     } else {
       setCanvasData(PRESET_TEMPLATES[key].canvas);
     }
@@ -141,48 +173,72 @@ export function BmcBuilder() {
   const totalItems = Object.values(canvasData).reduce((sum, arr) => sum + arr.length, 0);
   const blocksFilled = Object.values(canvasData).filter(arr => arr.length > 0).length;
   const healthScore = Math.min(100, Math.round((blocksFilled / 9) * 70 + Math.min(30, totalItems * 1.2)));
+  const selectedBlock = BMC_BLOCK_MAP[selectedKey];
 
-  const renderBlock = (title, blockKey, minHeight = '240px', isSpecial = false) => {
+  const renderBlock = (blockKey, minHeight = '240px', isSpecial = false) => {
     const items = canvasData[blockKey] || [];
+    const meta = BMC_BLOCK_MAP[blockKey];
+    const isSelected = selectedKey === blockKey;
     return (
       <div style={{
         background: isSpecial ? 'var(--ddk-gold-subtle)' : 'var(--ddk-white)',
-        border: `1.5px solid ${isSpecial ? 'var(--ddk-gold)' : 'var(--border-subtle)'}`,
+        border: `1.5px solid ${isSelected ? 'var(--ddk-primary-blue)' : isSpecial ? 'var(--ddk-gold)' : 'var(--border-subtle)'}`,
         borderRadius: 'var(--radius-md)',
         padding: '1rem',
         display: 'flex',
         flexDirection: 'column',
         minHeight,
-        boxShadow: 'var(--shadow-sm)'
+        boxShadow: isSelected ? '0 0 0 2px rgba(18,102,177,0.18)' : 'var(--shadow-sm)',
       }}>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '0.75rem',
+          alignItems: 'flex-start',
+          gap: '0.5rem',
+          marginBottom: '0.5rem',
           borderBottom: '1px solid var(--border-subtle)',
           paddingBottom: '0.4rem'
         }}>
-          <h4 style={{ 
-            fontSize: '0.825rem', 
-            fontWeight: 800, 
-            color: 'var(--ddk-dark)', 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.04em',
-            fontFamily: 'var(--font-heading)'
-          }}>
-            {title}
-          </h4>
+          <button
+            type="button"
+            onClick={() => setSelectedKey(blockKey)}
+            aria-pressed={isSelected}
+            aria-label={`Lihat definisi ${meta.idLabel}`}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              textAlign: 'left',
+              cursor: 'pointer',
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            <h4 style={{
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              color: 'var(--ddk-dark)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.03em',
+              fontFamily: 'var(--font-heading)',
+              lineHeight: 1.35,
+            }}>
+              {CANVAS_TITLES[blockKey]}
+            </h4>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.35rem' }}>
+              <LensBadge lens={meta.valueLens} kind="value" />
+              <LensBadge lens={meta.dfvLens} kind="dfv" />
+            </div>
+          </button>
           <span className={`badge ${isSpecial ? 'badge-gold' : 'badge-blue'}`} style={{ fontSize: '0.625rem', padding: '0.1rem 0.4rem' }}>
             {items.length}
           </span>
         </div>
 
-        {/* Item List */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem', overflowY: 'auto', maxHeight: '200px' }}>
           {items.map((item, idx) => (
-            <div 
-              key={idx}
+            <div
+              key={`${blockKey}-${idx}`}
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -208,6 +264,7 @@ export function BmcBuilder() {
                   flexShrink: 0
                 }}
                 title="Hapus"
+                aria-label={`Hapus poin dari ${meta.idLabel}`}
               >
                 <Trash2 size={12} />
               </button>
@@ -215,7 +272,6 @@ export function BmcBuilder() {
           ))}
         </div>
 
-        {/* Add Input */}
         <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.75rem' }}>
           <input
             type="text"
@@ -242,6 +298,7 @@ export function BmcBuilder() {
               borderRadius: 'var(--radius-sm)',
               cursor: 'pointer'
             }}
+            aria-label={`Tambah poin ke ${meta.idLabel}`}
           >
             <Plus size={14} />
           </button>
@@ -252,7 +309,6 @@ export function BmcBuilder() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Header & Controls */}
       <div className="card" style={{ background: 'var(--ddk-white)', borderTop: '4px solid var(--ddk-gold)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
@@ -260,10 +316,10 @@ export function BmcBuilder() {
               DDK Strategic Canvas Tool
             </span>
             <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--ddk-dark)' }}>
-              Business Model Canvas (Alexander Osterwalder)
+              Business Model Canvas
             </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginTop: '0.2rem' }}>
-              Rancang, uji, dan sesuaikan 9 blok bangunan bisnis ventura Anda dengan standar pembelajaran DDK.
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginTop: '0.35rem', maxWidth: '52rem' }}>
+              Kerangka Alexander Osterwalder dan Yves Pigneur untuk merancang, menguji, dan menyesuaikan sembilan blok bangunan yang menjelaskan bagaimana usaha Anda menciptakan, mengantarkan, dan menangkap nilai.
             </p>
           </div>
 
@@ -274,7 +330,6 @@ export function BmcBuilder() {
           </div>
         </div>
 
-        {/* Template Selector & Health Score */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -328,28 +383,75 @@ export function BmcBuilder() {
         </div>
       </div>
 
-      {/* 9-Block Osterwalder Canvas */}
+      <div className="card" style={{ background: 'var(--bg-surface)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.85rem' }}>
+          <LayoutGrid size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)', letterSpacing: '-0.02em' }}>
+            Dua lensa untuk membaca sembilan blok
+          </h2>
+        </div>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '1rem' }}>
+          Model bisnis, menurut Osterwalder dan Pigneur, adalah alasan mendasar bagaimana organisasi menciptakan, mengantarkan, dan menangkap nilai. Lensa kedua — Desirability, Feasibility, dan Viability — berasal dari design thinking IDEO, dan dipakai di modul ini untuk menguji apakah tawaran diinginkan pelanggan, bisa diwujudkan, dan layak secara ekonomi. Klik judul blok pada kanvas untuk melihat definisi dan contohnya.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.85rem' }}>
+          {Object.values(VALUE_LENSES).map((lens) => (
+            <div key={lens.id} style={{ border: '1px solid var(--border-subtle)', borderTop: `3px solid ${lens.color}`, borderRadius: 'var(--radius-md)', padding: '0.85rem' }}>
+              <strong style={{ display: 'block', color: lens.color, fontSize: '0.85rem', fontFamily: 'var(--font-heading)' }}>{lens.label}</strong>
+              <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.15rem 0 0.4rem' }}>{lens.en}</span>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55 }}>{lens.description}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.85rem', marginTop: '0.85rem' }}>
+          {Object.values(DFV_LENSES).map((lens) => (
+            <div key={lens.id} style={{ border: '1px solid var(--border-subtle)', borderTop: `3px solid ${lens.color}`, borderRadius: 'var(--radius-md)', padding: '0.85rem', background: 'var(--ddk-light-gray)' }}>
+              <strong style={{ display: 'block', color: lens.color, fontSize: '0.85rem', fontFamily: 'var(--font-heading)' }}>{lens.label}</strong>
+              <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', margin: '0.15rem 0 0.4rem' }}>{lens.idLabel} · {lens.blocks}</span>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55 }}>{lens.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {selectedBlock && (
+        <div className="card" style={{ background: 'var(--bg-surface)', borderLeft: '4px solid var(--ddk-primary-blue)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            <div>
+              <span className="badge badge-blue" style={{ marginBottom: '0.4rem' }}>{selectedBlock.code}</span>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
+                {selectedBlock.en} · {selectedBlock.idLabel}
+              </h2>
+            </div>
+            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+              <LensBadge lens={selectedBlock.valueLens} kind="value" />
+              <LensBadge lens={selectedBlock.dfvLens} kind="dfv" />
+            </div>
+          </div>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.75rem' }}>{selectedBlock.definition}</p>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.7rem' }}>
+            <strong>{selectedBlock.exampleTitle}.</strong> {selectedBlock.example}
+          </p>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginTop: '0.45rem' }}>{selectedBlock.extraExample}</p>
+        </div>
+      )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(5, 1fr)',
           gap: '1rem'
         }}>
-          {renderBlock("1. Key Partners", "keyPartners", "380px")}
-
+          {renderBlock('keyPartners', '380px')}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '380px' }}>
-            {renderBlock("2. Key Activities", "keyActivities", "182px")}
-            {renderBlock("6. Key Resources", "keyResources", "182px")}
+            {renderBlock('keyActivities', '182px')}
+            {renderBlock('keyResources', '182px')}
           </div>
-
-          {renderBlock("3. Value Propositions", "valuePropositions", "380px", true)}
-
+          {renderBlock('valuePropositions', '380px', true)}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', minHeight: '380px' }}>
-            {renderBlock("4. Customer Relationships", "customerRelationships", "182px")}
-            {renderBlock("7. Channels", "channels", "182px")}
+            {renderBlock('customerRelationships', '182px')}
+            {renderBlock('channels', '182px')}
           </div>
-
-          {renderBlock("5. Customer Segments", "customerSegments", "380px")}
+          {renderBlock('customerSegments', '380px')}
         </div>
 
         <div style={{
@@ -357,9 +459,81 @@ export function BmcBuilder() {
           gridTemplateColumns: '1fr 1fr',
           gap: '1rem'
         }}>
-          {renderBlock("8. Cost Structure", "costStructure", "220px")}
-          {renderBlock("9. Revenue Streams", "revenueStreams", "220px")}
+          {renderBlock('costStructure', '220px')}
+          {renderBlock('revenueStreams', '220px')}
         </div>
+      </div>
+
+      <div className="card" style={{ background: 'var(--bg-surface)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+          <BookOpen size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Panduan sembilan blok</h2>
+        </div>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: 1.6 }}>
+          Urutan di bawah mengikuti cara mengajarkan kanvas: mulai dari pelanggan, lalu tawaran, saluran, hubungan, pendapatan, baru sisi infrastruktur dan biaya. Contoh utama di seluruh blok memakai usaha yang sama, Kopi AJIB, agar hubungan antarbok terlihat utuh.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+          {BMC_BLOCKS.map((block) => {
+            const open = openGuideKey === block.key;
+            return (
+              <div key={block.key} style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                <button
+                  type="button"
+                  aria-expanded={open}
+                  onClick={() => setOpenGuideKey(open ? null : block.key)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    flexWrap: 'wrap',
+                    padding: '0.8rem 1rem',
+                    background: open ? 'var(--ddk-light-gray)' : 'var(--ddk-white)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span style={{ fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)', fontSize: '0.9rem' }}>
+                    {block.code}. {block.en} · {block.idLabel}
+                  </span>
+                  <span style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                    <LensBadge lens={block.valueLens} kind="value" />
+                    <LensBadge lens={block.dfvLens} kind="dfv" />
+                  </span>
+                </button>
+                {open && (
+                  <div style={{ padding: '0 1rem 1rem', background: 'var(--ddk-light-gray)' }}>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: 1.65 }}>{block.definition}</p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.65rem' }}>
+                      <strong>{block.exampleTitle}.</strong> {block.example}
+                    </p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginTop: '0.4rem' }}>{block.extraExample}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="card" style={{ background: 'var(--bg-surface)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+          <Quote size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Referensi</h2>
+        </div>
+        <ul style={{ paddingLeft: '1.15rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {BMC_REFERENCES.map((ref) => (
+            <li key={ref.citation} style={{ fontSize: '0.85rem', color: 'var(--text-body)', lineHeight: 1.6 }}>
+              <span style={{ fontWeight: 600 }}>{ref.citation}</span>
+              <span style={{ display: 'block', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>{ref.note}</span>
+            </li>
+          ))}
+        </ul>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.9rem', lineHeight: 1.55 }}>
+          Business Model Canvas adalah kerangka kerja Strategyzer (Osterwalder & Pigneur), digunakan di sini untuk tujuan pembelajaran dengan atribusi. Nomor halaman tidak dicantumkan karena berbeda antarcetakan.
+        </p>
       </div>
     </div>
   );
