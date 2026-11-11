@@ -7,6 +7,7 @@ import { QuizSection } from './components/QuizSection';
 import { CaseStudies } from './components/CaseStudies';
 import { StartupSimulator } from './components/StartupSimulator';
 import { BmcBuilder } from './components/BmcBuilder';
+import { VpdBuilder } from './components/VpdBuilder';
 import { KnowledgeHub } from './components/KnowledgeHub';
 import { SourcesReading } from './components/SourcesReading';
 import { GradesDashboard } from './components/GradesDashboard';
@@ -202,6 +203,10 @@ export default function App() {
 
           {activeTab === 'bmc-builder' && (
             <BmcBuilder />
+          )}
+
+          {activeTab === 'vpd-builder' && (
+            <VpdBuilder />
           )}
 
           {activeTab === 'knowledge-hub' && (

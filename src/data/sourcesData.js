@@ -48,16 +48,16 @@ export const SOURCES_AND_READINGS = [
   {
     id: "src-4",
     title: "Business Model Generation & Value Proposition Design",
-    authors: "Alexander Osterwalder, Yves Pigneur, et al.",
+    authors: "Alexander Osterwalder, Yves Pigneur, Greg Bernarda, Alan Smith",
     publisher: "John Wiley & Sons (Strategyzer Series)",
     type: "Strategic Framework",
-    focus: "The 9 building blocks of the Business Model Canvas, Value Proposition Canvas, and business model prototyping.",
+    focus: "The 9 building blocks of the Business Model Canvas, Value Proposition Canvas, problem-solution / product-market / business model fit, and business model prototyping.",
     keyChapters: [
       "Part 1: The Business Model Canvas Canvas Design",
       "Part 2: Business Model Patterns (Multi-sided, Freemium, Long Tail)",
       "Part 3: Value Proposition Canvas Design & Testing"
     ],
-    citation: "Osterwalder, A., & Pigneur, Y. (2010). Business Model Generation. John Wiley & Sons."
+    citation: "Osterwalder, A., & Pigneur, Y. (2010). Business Model Generation. John Wiley & Sons. Osterwalder, A., Pigneur, Y., Bernarda, G., & Smith, A. (2014). Value Proposition Design. John Wiley & Sons."
   },
   {
     id: "src-5",
