@@ -18,7 +18,7 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
   });
 
   return (
-    <div style={{
+    <div role="dialog" aria-modal="true" aria-label="DDK Credential preview" style={{
       position: 'fixed',
       top: 0,
       left: 0,
@@ -61,8 +61,9 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Nama Penerima:</label>
+              <label htmlFor="certificate-recipient" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Nama Penerima:</label>
               <input
+                id="certificate-recipient"
                 type="text"
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
@@ -81,7 +82,7 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
             <button onClick={handlePrint} className="btn btn-gold" style={{ fontSize: '0.8rem', padding: '0.45rem 0.95rem' }}>
               <Printer size={14} /> Cetak / Unduh PDF
             </button>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+            <button aria-label="Close certificate" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
               <X size={22} />
             </button>
           </div>
