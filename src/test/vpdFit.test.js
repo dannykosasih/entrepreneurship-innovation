@@ -88,7 +88,7 @@ describe('computeProblemSolutionFit', () => {
     expect(fit.hasValueItems).toBe(true);
     expect(fit.score).toBe(100);
     expect(fit.totals.unaddressed).toBe(0);
-    expect(fit.categories.jobs.covered).toBe(3);
+    expect(fit.categories.jobs.covered).toBe(4);
     expect(fit.categories.pains.covered).toBe(4);
     expect(fit.categories.gains.covered).toBe(4);
   });
@@ -98,12 +98,16 @@ describe('canvas helpers', () => {
   it('normalizes missing arrays and job kinds', () => {
     const canvas = normalizeVpdCanvas({
       segmentName: 'Segmen uji',
-      jobs: [{ text: 'Tanpa id', kind: 'mystery' }],
+      jobs: [
+        { text: 'Tanpa id', kind: 'mystery' },
+        { id: 'j-s', text: 'Pesan di aplikasi', kind: 'supporting' },
+      ],
     });
     expect(canvas.segmentName).toBe('Segmen uji');
-    expect(canvas.jobs).toHaveLength(1);
+    expect(canvas.jobs).toHaveLength(2);
     expect(canvas.jobs[0].id).toBeTruthy();
     expect(canvas.jobs[0].kind).toBe('functional');
+    expect(canvas.jobs[1].kind).toBe('supporting');
     expect(canvas.pains).toEqual([]);
     expect(canvas.links).toEqual([]);
   });

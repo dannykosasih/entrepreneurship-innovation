@@ -99,13 +99,50 @@ describe('Neon Nights LMS regression', () => {
     const user=userEvent.setup();render(<App/>);
     await user.click(nav('Explore & tools','VPD Proposisi Nilai'));
     expect(screen.getByRole('heading',{level:1})).toHaveTextContent(/Kanvas Proposisi Nilai/);
-    await user.click(screen.getByRole('button',{name:'Muat contoh Kopi AJIB'}));
+    await user.click(screen.getByRole('button',{name:'Muat contoh ilustrasi Kopi AJIB'}));
     expect(screen.getByDisplayValue(/Profesional muda perkantoran urban/)).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
     const stored=JSON.parse(localStorage.getItem('innoventures_vpd_canvas'));
-    expect(stored.jobs.length).toBe(3);
+    expect(stored.jobs.length).toBe(4);
     expect(stored.links.length).toBeGreaterThan(0);
     await user.click(screen.getByRole('button',{name:'Reset kanvas'}));
     expect(JSON.parse(localStorage.getItem('innoventures_vpd_canvas')).jobs).toEqual([]);
+  });
+
+
+  it('renders the book-shaped Value Proposition Canvas and keeps matching plus fit score', async () => {
+    const user=userEvent.setup();render(<App/>);
+    await user.click(nav('Explore & tools','VPD Proposisi Nilai'));
+    expect(screen.getByRole('region',{name:'Peta Nilai (Value Map)'})).toBeInTheDocument();
+    expect(screen.getByRole('region',{name:'Profil Pelanggan (Customer Profile)'})).toBeInTheDocument();
+    expect(screen.getByRole('heading',{name:'Kanvas Proposisi Nilai, bentuk buku'})).toBeInTheDocument();
+    await user.click(screen.getByRole('button',{name:'Muat contoh ilustrasi Kopi AJIB'}));
+    expect(screen.getByText('100%')).toBeInTheDocument();
+    expect(screen.getByRole('button',{name:'Antre panjang di kafe pada jam berangkat kerja.'})).toBeInTheDocument();
+    expect(screen.getByRole('button',{name:'Pesan duluan lewat aplikasi sehingga tidak perlu antre di gerai.'})).toBeInTheDocument();
+  });
+
+  it('saves interactive Test Cards from Cara Menguji on the VPD tool', async () => {
+    const user=userEvent.setup();render(<App/>);
+    await user.click(nav('Explore & tools','VPD Proposisi Nilai'));
+    expect(screen.getByRole('heading',{name:'Cara Menguji'})).toBeInTheDocument();
+    expect(screen.getByText(/Simple Landing Page/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button',{name:'Muat contoh Kartu Tes Kopi AJIB'}));
+    expect(screen.getAllByText(/Tes antre dan pesan-ambil/).length).toBeGreaterThan(0);
+    const stored=JSON.parse(localStorage.getItem('innoventures_testing_lab_vpd'));
+    expect(stored.testCards.length).toBeGreaterThan(0);
+    expect(stored.testCards[0].criteria).toMatch(/ilustrasi/i);
+    await user.type(screen.getByLabelText('Kami percaya bahwa…'),'Hipotesis uji regresi');
+    await user.click(screen.getByRole('button',{name:'Simpan Kartu Tes'}));
+    expect(JSON.parse(localStorage.getItem('innoventures_testing_lab_vpd')).testCards.some((card)=>card.hypothesis==='Hipotesis uji regresi')).toBe(true);
+  });
+
+  it('adds Cara Menguji and original block icons to the Business Model Canvas tool', async () => {
+    const user=userEvent.setup();render(<App/>);
+    await user.click(nav('Explore & tools','BMC Strategy Tool'));
+    expect(screen.getByRole('heading',{name:'Cara Menguji'})).toBeInTheDocument();
+    expect(screen.getByText(/Tata letak sembilan blok mengikuti Business Model Generation/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button',{name:'Muat contoh Kartu Tes Kopi AJIB'}));
+    expect(JSON.parse(localStorage.getItem('innoventures_testing_lab_bmc')).testCards[0].lens).toBe('viability');
   });
 });

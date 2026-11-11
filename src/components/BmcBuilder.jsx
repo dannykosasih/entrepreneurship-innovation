@@ -8,10 +8,13 @@ import {
   Quote,
 } from 'lucide-react';
 import { BMC_BLOCKS, BMC_BLOCK_MAP, VALUE_LENSES, DFV_LENSES, BMC_REFERENCES } from '../data/bmcBlocksData';
+import { BMC_BLOCK_ICONS, CanvasIcon } from './CanvasIcon';
+import { TestingLab } from './TestingLab';
+import '../vpc-canvas.css';
 
 const PRESET_TEMPLATES = {
   kopiAjib: {
-    name: "Kopi AJIB (DDK New Retail Benchmark)",
+    name: "Kopi AJIB — template ilustrasi (studi kasus pembelajaran)",
     canvas: {
       keyPartners: [
         "Koperasi Petani Aceh Gayo, Toraja & Kintamani",
@@ -22,7 +25,7 @@ const PRESET_TEMPLATES = {
       keyActivities: [
         "Penyangraian Terpusat & Kontrol Kualitas Standar",
         "Model Prediksi Permintaan AI & Restock Otomatis",
-        "Pelatihan Cepat Barista & Layanan Cepat (< 180 dtk)",
+        "Pelatihan Cepat Barista & Janji Layanan Cepat (target <180 detik: ilustrasi tambahan, bukan angka kasus)",
         "Pengembangan Fitur Aplikasi Mobile & Loyalitas"
       ],
       keyResources: [
@@ -41,7 +44,7 @@ const PRESET_TEMPLATES = {
         "Layanan Mandiri Otomatis via Aplikasi Mobile",
         "Program Loyalitas Bertingkat & Notifikasi Promo Cerdas",
         "Pelayanan Ramah & Cepat di Bar Gerai",
-        "Pengembalian Dana / Pesanan Instan jika Rasa Tidak Pas"
+        "Pengembalian Dana Instan jika Rasa Tidak Pas (ilustrasi tambahan, bukan angka kasus)"
       ],
       channels: [
         "Aplikasi Mobile Resmi Kopi AJIB (57% Transaksi)",
@@ -50,20 +53,20 @@ const PRESET_TEMPLATES = {
         "Pesanan Rombongan Kantor & Katering Korporat"
       ],
       customerSegments: [
-        "Profesional Muda Perkantoran Urban (42% Omzet)",
-        "Mahasiswa Pencari Kafein Terjangkau & Tempat Nongkrong (28%)",
-        "Pekerja Remote / WFA Butuh Kopi Harian (18%)",
-        "Pembeli Musiman / Coba-coba karena Diskon (12%)"
+        "Profesional Muda Perkantoran Urban (ilustrasi segmen utama)",
+        "Mahasiswa Pencari Kafein Terjangkau & Tempat Nongkrong (ilustrasi)",
+        "Pekerja Remote / WFA Butuh Kopi Harian (ilustrasi)",
+        "Pembeli Musiman / Coba-coba karena Diskon (ilustrasi)"
       ],
       costStructure: [
         "COGS Bahan Baku: Biji Kopi, Susu Segar, Gula Aren (46%)",
         "Gaji Barista & Insentif Performa Gerai Berbasis Data",
-        "Sewa Gerai Compact 15-25 m² & Biaya Utilitas",
+        "Sewa Gerai Compact & Biaya Utilitas (luas 15–25 m²: ilustrasi tambahan, bukan angka kasus)",
         "Biaya Server Cloud & Pemeliharaan Model AI",
         "Iklan Performa Digital & Promo Referral Aplikasi"
       ],
       revenueStreams: [
-        "Penjualan Minuman Cangkir Harian (Signature Kopi Susu 46%)",
+        "Penjualan Minuman Cangkir Harian (pangsa signature 46% adalah ilustrasi tambahan, bukan angka kasus)",
         "Minuman Botol 1 Liter Siap Minum & Kategori Non-Kopi",
         "Cross-sell Makanan Ringan, Roti & Pastry Pendamping",
         "Saldo Pre-paid & Voucher Pelanggan Korporat"
@@ -71,7 +74,7 @@ const PRESET_TEMPLATES = {
     }
   },
   edutech: {
-    name: "AI Entrepreneurship LMS (EduTech)",
+    name: "EduTech AI LMS — template ilustrasi (contoh buatan)",
     canvas: {
       keyPartners: ["Universitas & Sekolah Bisnis", "Mentor Industri & Praktisi", "Jaringan Modal Ventura"],
       keyActivities: ["Kurasi Kurikulum Berbasis AI", "Pengembangan Simulator Bisnis", "Pemeliharaan Platform LMS"],
@@ -214,17 +217,22 @@ export function BmcBuilder() {
               minWidth: 0,
             }}
           >
-            <h4 style={{
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              color: 'var(--ddk-dark)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.03em',
-              fontFamily: 'var(--font-heading)',
-              lineHeight: 1.35,
-            }}>
-              {CANVAS_TITLES[blockKey]}
-            </h4>
+            <div className="bmc-block-icon-row">
+              <span className="canvas-icon-badge">
+                <CanvasIcon name={BMC_BLOCK_ICONS[blockKey]} size={18} />
+              </span>
+              <h4 style={{
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                color: 'var(--ddk-dark)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.03em',
+                fontFamily: 'var(--font-heading)',
+                lineHeight: 1.35,
+              }}>
+                {CANVAS_TITLES[blockKey]}
+              </h4>
+            </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.35rem' }}>
               <LensBadge lens={meta.valueLens} kind="value" />
               <LensBadge lens={meta.dfvLens} kind="dfv" />
@@ -349,14 +357,14 @@ export function BmcBuilder() {
               className={`btn ${activeTemplate === 'kopiAjib' ? 'btn-primary' : 'btn-outline'}`}
               style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem' }}
             >
-              Kopi AJIB New Retail
+              Kopi AJIB (ilustrasi)
             </button>
             <button
               onClick={() => handleLoadTemplate('edutech')}
               className={`btn ${activeTemplate === 'edutech' ? 'btn-primary' : 'btn-outline'}`}
               style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem' }}
             >
-              EduTech AI LMS
+              EduTech AI LMS (ilustrasi)
             </button>
             <button
               onClick={() => handleLoadTemplate('blank')}
@@ -369,18 +377,21 @@ export function BmcBuilder() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Kelengkapan Model:
+              Kelengkapan isian:
             </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '1.2rem', fontWeight: 900, color: healthScore >= 80 ? 'var(--ddk-primary-blue)' : '#D97706', fontFamily: 'var(--font-heading)' }}>
                 {healthScore}%
               </span>
               <span className={`badge ${healthScore >= 80 ? 'badge-gold' : 'badge-soft'}`}>
-                {healthScore >= 80 ? 'Tervalidasi' : 'Perlu Diisi'}
+                {healthScore >= 80 ? 'Lengkap' : 'Masih ada blok kosong'}
               </span>
             </div>
           </div>
         </div>
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.75rem', lineHeight: 1.55 }}>
+          Skor ini hanya mengukur apakah sembilan blok sudah diisi, bukan apakah model sudah divalidasi di lapangan. Contoh di template adalah ilustrasi pembelajaran.
+        </p>
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
@@ -390,8 +401,14 @@ export function BmcBuilder() {
             Dua lensa untuk membaca sembilan blok
           </h2>
         </div>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '0.75rem' }}>
+          Model bisnis, menurut Osterwalder dan Pigneur dalam Business Model Generation (bagian “Definition of a Business Model”), adalah alasan mendasar bagaimana organisasi menciptakan, mengantarkan, dan menangkap nilai. Buku yang sama juga menata sembilan blok ke empat wilayah: pelanggan, tawaran, infrastruktur, dan kelayakan finansial.
+        </p>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '0.75rem' }}>
+          Pembagian tiap blok ke Creating, Delivering, dan Capturing Value di halaman ini adalah konvensi pengajaran, bukan tabel resmi di Business Model Generation (2010). Kami menempatkan tawaran dan infrastruktur (VP, KP, KA, KR) pada menciptakan nilai; saluran, hubungan, dan segmen (CH, CR, CS) pada mengantarkan nilai; serta pendapatan dan biaya (RS, C$) pada menangkap nilai.
+        </p>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '1rem' }}>
-          Model bisnis, menurut Osterwalder dan Pigneur, adalah alasan mendasar bagaimana organisasi menciptakan, mengantarkan, dan menangkap nilai. Lensa kedua — Desirability, Feasibility, dan Viability — berasal dari design thinking IDEO, dan dipakai di modul ini untuk menguji apakah tawaran diinginkan pelanggan, bisa diwujudkan, dan layak secara ekonomi. Klik judul blok pada kanvas untuk melihat definisi dan contohnya.
+          Lensa kedua — Desirability, Feasibility, dan Viability — berasal dari design thinking IDEO: apakah tawaran diinginkan, dapat diwujudkan, dan layak secara ekonomi. Pemasangan ketiga lensa itu ke sembilan blok BMC (Desirability: CS, VP, CH, CR; Feasibility: KP, KA, KR; Viability: RS, C$) adalah konvensi Strategyzer, misalnya dalam Testing Business Ideas (Bland & Osterwalder, 2019) dan artikel Osterwalder (2017). Ini lensa risiko untuk merancang tes, bukan sekat yang saling meniadakan: harga atau saluran dapat menyentuh lebih dari satu lensa. Klik judul blok pada kanvas untuk melihat definisi, pertanyaan pemandu, dan contoh berlabel ilustrasi.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.85rem' }}>
           {Object.values(VALUE_LENSES).map((lens) => (
@@ -428,6 +445,11 @@ export function BmcBuilder() {
             </div>
           </div>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.75rem' }}>{selectedBlock.definition}</p>
+          {selectedBlock.questions && (
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.7rem' }}>
+              <strong>Pertanyaan pemandu.</strong> {selectedBlock.questions}
+            </p>
+          )}
           <p style={{ fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.7rem' }}>
             <strong>{selectedBlock.exampleTitle}.</strong> {selectedBlock.example}
           </p>
@@ -435,7 +457,10 @@ export function BmcBuilder() {
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="bmc-book-canvas" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+          Tata letak sembilan blok mengikuti Business Model Generation: mitra, aktivitas, sumber daya, proposisi nilai, hubungan, saluran, dan segmen di baris atas; struktur biaya dan aliran pendapatan di baris bawah. Ikon orisinal DeKa.
+        </p>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(5, 1fr)',
@@ -470,7 +495,7 @@ export function BmcBuilder() {
           <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Panduan sembilan blok</h2>
         </div>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: 1.6 }}>
-          Urutan di bawah mengikuti cara mengajarkan kanvas: mulai dari pelanggan, lalu tawaran, saluran, hubungan, pendapatan, baru sisi infrastruktur dan biaya. Contoh utama di seluruh blok memakai usaha yang sama, Kopi AJIB, agar hubungan antarbok terlihat utuh.
+          Urutan di bawah mengikuti cara mengajarkan kanvas: mulai dari pelanggan, lalu tawaran, saluran, hubungan, pendapatan, baru sisi infrastruktur dan biaya. Contoh di seluruh blok memakai usaha yang sama, Kopi AJIB, agar hubungan antarblok terlihat utuh. Contoh Kopi AJIB diambil dari studi kasus pembelajaran kursus ini, bukan dari verifikasi independen atas perusahaan publik. Angka yang tidak ada di naskah kasus ditandai sebagai ilustrasi tambahan.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
           {BMC_BLOCKS.map((block) => {
@@ -506,6 +531,11 @@ export function BmcBuilder() {
                 {open && (
                   <div style={{ padding: '0 1rem 1rem', background: 'var(--ddk-light-gray)' }}>
                     <p style={{ fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: 1.65 }}>{block.definition}</p>
+                    {block.questions && (
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.65rem' }}>
+                        <strong>Pertanyaan pemandu.</strong> {block.questions}
+                      </p>
+                    )}
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.65rem' }}>
                       <strong>{block.exampleTitle}.</strong> {block.example}
                     </p>
@@ -517,6 +547,8 @@ export function BmcBuilder() {
           })}
         </div>
       </div>
+
+      <TestingLab scope="bmc" bmcData={canvasData} />
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
