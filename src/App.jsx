@@ -12,6 +12,7 @@ import { SourcesReading } from './components/SourcesReading';
 import { GradesDashboard } from './components/GradesDashboard';
 import { CertificateModal } from './components/CertificateModal';
 import { COURSES } from './data/coursesData';
+import './neon.css';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -19,6 +20,8 @@ export default function App() {
   const [userPersona, setUserPersona] = useState('student');
   const [activeQuizId, setActiveQuizId] = useState(null);
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = (tab) => { setActiveTab(tab); setMenuOpen(false); };
 
   // Persistent LMS State
   const [completedModules, setCompletedModules] = useState(() => {
@@ -78,7 +81,7 @@ export default function App() {
 
   // Handler functions
   const handleToggleCompleteModule = (modId) => {
-    setCompletedModules(prev => 
+    setCompletedModules(prev =>
       prev.includes(modId) ? prev.filter(id => id !== modId) : [...prev, modId]
     );
   };
@@ -91,7 +94,7 @@ export default function App() {
   };
 
   const handleMarkCaseComplete = (caseId) => {
-    setCompletedCases(prev => 
+    setCompletedCases(prev =>
       prev.includes(caseId) ? prev : [...prev, caseId]
     );
   };
@@ -116,17 +119,20 @@ export default function App() {
   const casePct = Math.round((completedCases.length / 2) * 100);
   const simPct = simulatorScore !== undefined ? simulatorScore : 0;
   const overallScore = Math.round(
-    (moduleProgressPct * 0.20) + 
-    (avgQuizPct * 0.30) + 
-    (casePct * 0.25) + 
+    (moduleProgressPct * 0.20) +
+    (avgQuizPct * 0.30) +
+    (casePct * 0.25) +
     (simPct * 0.25)
   );
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
+    <div className="neon-app" data-design="neon-nights" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
+      <a className="skip-link" href="#learning-content">Skip to learning content</a>
       <Navbar
+        menuOpen={menuOpen}
+        onToggleMenu={() => setMenuOpen(open => !open)}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={navigate}
         userPersona={userPersona}
         setUserPersona={setUserPersona}
         progress={{ completedModulesCount: completedModules.length, totalModulesCount: totalModules }}
@@ -134,14 +140,15 @@ export default function App() {
         onOpenCertificate={() => setIsCertModalOpen(true)}
       />
 
-      <div style={{ display: 'flex', flex: 1, width: '100%', minHeight: 'calc(100vh - 70px)' }}>
-        <Sidebar 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
+      <div className="neon-layout" style={{ display: 'flex', flex: 1, width: '100%', minHeight: 'calc(100vh - 70px)' }}>
+        <Sidebar
+          menuOpen={menuOpen}
+          activeTab={activeTab}
+          setActiveTab={navigate}
           onOpenCertificate={() => setIsCertModalOpen(true)}
         />
 
-        <main style={{ flex: 1, padding: '24px 32px 48px', minWidth: 0, overflowY: 'auto' }}>
+        <main id="learning-content" tabIndex={-1} className={activeTab === 'dashboard' ? 'neon-main' : 'neon-main workspace-pane'} style={{ flex: 1, padding: '24px 32px 48px', minWidth: 0, overflowY: 'auto' }}>
           {activeTab === 'dashboard' && (
             <Dashboard
               completedModules={completedModules}
@@ -149,7 +156,7 @@ export default function App() {
               completedCases={completedCases}
               simulatorScore={simulatorScore}
               overallScore={overallScore}
-              setActiveTab={setActiveTab}
+              setActiveTab={navigate}
               onSelectModule={(id) => {
                 setSelectedCourseId(id);
                 setActiveTab('courses');
