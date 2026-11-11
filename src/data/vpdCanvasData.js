@@ -137,7 +137,7 @@ export const FIT_LEVELS = [
     idLabel: 'Kecocokan Produk–Pasar',
     stage: 'Di pasar',
     description:
-      'Ada bukti bahwa produk, pereda nyeri, dan pencipta manfaat benar-benar menciptakan nilai dan mulai mendapat traksi — dipakai, dikembalikan, direkomendasikan, atau dibayar — setelah rangkaian tes yang menopang atau menolak hipotesis. Skor tautan di kanvas belum membuktikan product-market fit.',
+      'Ada bukti bahwa produk, pereda nyeri, dan pencipta manfaat benar-benar menciptakan nilai dan mulai mendapat traksi — dipakai berulang, direkomendasikan, atau dibayar — setelah rangkaian tes yang menopang atau menolak hipotesis. Skor tautan di kanvas belum membuktikan product-market fit.',
   },
   {
     id: 'business-model',
@@ -190,9 +190,9 @@ export const EXAMPLE_VPD_CANVAS = {
   ],
   painRelievers: [
     { id: 'rel-1', text: 'Pesan duluan lewat aplikasi sehingga tidak perlu antre di gerai.' },
-    { id: 'rel-2', text: 'Harga Rp 18.000 untuk kualitas setara kafe.' },
+    { id: 'rel-2', text: 'Harga harian sekitar Rp 18.000–22.000 (kisaran naskah kasus) untuk kualitas setara kafe.' },
     { id: 'rel-3', text: 'Standar rasa nasional dan kontrol mutu penyangraian terpusat.' },
-    { id: 'rel-4', text: 'Pengembalian dana instan jika rasa tidak pas.' },
+    { id: 'rel-4', text: 'Pengembalian dana instan jika rasa tidak pas (ilustrasi tambahan, tidak ada di naskah kasus).' },
   ],
   gainCreators: [
     { id: 'gc-1', text: 'Opsi pesan duluan agar tinggal ambil (janji kecepatan grab-and-go; “180 detik” hanya ilustrasi tambahan).' },

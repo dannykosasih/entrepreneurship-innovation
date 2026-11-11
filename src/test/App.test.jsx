@@ -127,7 +127,7 @@ describe('Neon Nights LMS regression', () => {
     await user.click(nav('Explore & tools','VPD Proposisi Nilai'));
     expect(screen.getByRole('heading',{name:'Cara Menguji'})).toBeInTheDocument();
     expect(screen.getByText(/Simple Landing Page/)).toBeInTheDocument();
-    await user.click(screen.getByRole('button',{name:'Muat contoh Kartu Tes Kopi AJIB'}));
+    await user.click(screen.getByRole('button',{name:'Muat contoh ilustrasi Kartu Tes Kopi AJIB'}));
     expect(screen.getAllByText(/Tes antre dan pesan-ambil/).length).toBeGreaterThan(0);
     const stored=JSON.parse(localStorage.getItem('innoventures_testing_lab_vpd'));
     expect(stored.testCards.length).toBeGreaterThan(0);
@@ -142,7 +142,7 @@ describe('Neon Nights LMS regression', () => {
     await user.click(nav('Explore & tools','BMC Strategy Tool'));
     expect(screen.getByRole('heading',{name:'Cara Menguji'})).toBeInTheDocument();
     expect(screen.getByText(/Tata letak sembilan blok mengikuti Business Model Generation/)).toBeInTheDocument();
-    await user.click(screen.getByRole('button',{name:'Muat contoh Kartu Tes Kopi AJIB'}));
+    await user.click(screen.getByRole('button',{name:'Muat contoh ilustrasi Kartu Tes Kopi AJIB'}));
     expect(JSON.parse(localStorage.getItem('innoventures_testing_lab_bmc')).testCards[0].lens).toBe('viability');
   });
 });

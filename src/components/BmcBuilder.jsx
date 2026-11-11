@@ -20,10 +20,10 @@ const PRESET_TEMPLATES = {
         "Koperasi Petani Aceh Gayo, Toraja & Kintamani",
         "Penyedia Cloud POS & Server AI Moka/Pawoon",
         "Armada Pengantaran Ojol (GoFood, GrabFood, ShopeeFood)",
-        "Pengelola Gedung Perkantoran SCBD & Kampus"
+        "Pengelola Gedung Perkantoran & Kampus (lokasi SCBD: ilustrasi tambahan, bukan angka kasus)"
       ],
       keyActivities: [
-        "Penyangraian Terpusat & Kontrol Kualitas Standar",
+        "Penyangraian Terpusat & Kontrol Kualitas Standar (penyangraian terpusat: ilustrasi tambahan, tidak eksplisit di naskah kasus)",
         "Model Prediksi Permintaan AI & Restock Otomatis",
         "Pelatihan Cepat Barista & Janji Layanan Cepat (target <180 detik: ilustrasi tambahan, bukan angka kasus)",
         "Pengembangan Fitur Aplikasi Mobile & Loyalitas"
@@ -35,7 +35,7 @@ const PRESET_TEMPLATES = {
         "Jaringan Barista Terlatih Standar Nasional"
       ],
       valuePropositions: [
-        "Kopi Susu Aren Espresso Berkualitas Kafe Rp 18.000",
+        "Kopi Susu Aren Espresso Berkualitas Kafe Rp 18.000–22.000 (kisaran naskah kasus)",
         "Pesan Duluan via Aplikasi Tanpa Antre di Gerai",
         "Konsistensi Rasa Standar di Seluruh 812 Gerai",
         "Personalisasi Promo & Gamifikasi Poin Loyalitas"
@@ -47,7 +47,7 @@ const PRESET_TEMPLATES = {
         "Pengembalian Dana Instan jika Rasa Tidak Pas (ilustrasi tambahan, bukan angka kasus)"
       ],
       channels: [
-        "Aplikasi Mobile Resmi Kopi AJIB (57% Transaksi)",
+        "Aplikasi Mobile Resmi Kopi AJIB (57% transaksi, 2024 menurut naskah kasus)",
         "Gerai Compact Grab-and-Go di Lobi Kantor & Stasiun",
         "Kemitraan Marketplace Makanan Online",
         "Pesanan Rombongan Kantor & Katering Korporat"
@@ -59,7 +59,7 @@ const PRESET_TEMPLATES = {
         "Pembeli Musiman / Coba-coba karena Diskon (ilustrasi)"
       ],
       costStructure: [
-        "COGS Bahan Baku: Biji Kopi, Susu Segar, Gula Aren (46%)",
+        "COGS Bahan Baku: Biji Kopi, Susu Segar, Gula Aren (46% pada 2024 menurut naskah kasus)",
         "Gaji Barista & Insentif Performa Gerai Berbasis Data",
         "Sewa Gerai Compact & Biaya Utilitas (luas 15–25 m²: ilustrasi tambahan, bukan angka kasus)",
         "Biaya Server Cloud & Pemeliharaan Model AI",
@@ -67,9 +67,9 @@ const PRESET_TEMPLATES = {
       ],
       revenueStreams: [
         "Penjualan Minuman Cangkir Harian (pangsa signature 46% adalah ilustrasi tambahan, bukan angka kasus)",
-        "Minuman Botol 1 Liter Siap Minum & Kategori Non-Kopi",
-        "Cross-sell Makanan Ringan, Roti & Pastry Pendamping",
-        "Saldo Pre-paid & Voucher Pelanggan Korporat"
+        "Minuman Botol 1 Liter Siap Minum & Kategori Non-Kopi (ilustrasi tambahan, tidak ada di naskah kasus)",
+        "Cross-sell Makanan Ringan, Roti & Pastry Pendamping (ilustrasi tambahan, tidak ada di naskah kasus)",
+        "Saldo Pre-paid & Voucher Pelanggan Korporat (ilustrasi tambahan, tidak ada di naskah kasus)"
       ]
     }
   },

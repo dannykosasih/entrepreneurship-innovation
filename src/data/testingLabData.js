@@ -162,7 +162,7 @@ export const EXPERIMENT_TYPES = [
     evidence: 'Sedang untuk kegunaan yang diamati, rendah untuk adopsi atau pembayaran.',
     costTime: 'Biaya rendah; waktu ilustrasi 1–3 hari.',
     metric: 'Ilustrasi: sekurang-kurangnya 4 dari 5 peserta menyelesaikan tugas utama tanpa bantuan. Sampel kecil bukan bukti statistik populasi.',
-    source: 'Testing Business Ideas, bagian Discovery; prinsip “ucapan dibanding tindakan” di bagian Test Value Proposition Design.',
+    source: 'Testing Business Ideas, bagian Discovery; prinsip “ucapan dibanding tindakan” di bagian Test pada Value Proposition Design.',
   },
   {
     id: 'storyboard',
@@ -280,7 +280,7 @@ export const FIT_CHECKS = [
     id: 'product-market',
     title: 'Product-Market Fit',
     idLabel: 'Kecocokan produk–pasar',
-    how: 'Dicari bukti bahwa tawaran sungguh meredakan nyeri atau menciptakan manfaat, plus traksi dan pemakaian sesuai siklus kebutuhan. Eksperimen yang relevan: concierge, Wizard of Oz, dan MVP berfitur tunggal; transaksi atau pra-pesan dilengkapi pengukuran hasil pelanggan, retensi, dan pemakaian ulang. Pendaftaran, klik, satu pembelian, atau kampanye yang sukses saja tidak cukup. Pra-pesan bukan bukti manfaat setelah produk dipakai. Artikel Strategyzer “Survival of the fittest” merujuk hlm. 48–49 pada Value Proposition Design untuk ketiga tingkat ini.',
+    how: 'Dicari bukti bahwa tawaran sungguh meredakan nyeri atau menciptakan manfaat, plus traksi dan pemakaian sesuai siklus kebutuhan. Eksperimen yang relevan: concierge, Wizard of Oz, dan MVP berfitur tunggal; transaksi atau pra-pesan dilengkapi pengukuran hasil pelanggan, retensi, dan pemakaian ulang. Pendaftaran, klik, satu pembelian, atau kampanye yang sukses saja tidak cukup. Pra-pesan bukan bukti manfaat setelah produk dipakai. Artikel Strategyzer “Survival of the fittest” merujuk hlm. 48–49 pada Value Proposition Design untuk cetakan yang mereka kutip; halaman dapat berbeda antarcetakan. Rujukan itu dipakai untuk ketiga tingkat fit.',
     experiments: ['concierge', 'wizard', 'mvp', 'presales'],
   },
   {
@@ -350,7 +350,7 @@ export const EXAMPLE_ASSUMPTIONS = {
   bmc: [
     { id: 'bmc-a1', lens: 'desirability', text: 'Profesional muda perkantoran urban adalah segmen yang cukup besar dan bisa dijangkau lewat gerai compact serta aplikasi.', source: 'Segmen pelanggan', importance: 5, evidence: 3 },
     { id: 'bmc-a2', lens: 'desirability', text: 'Proposisi “kopi berkualitas kafe, cepat, tanpa antre, harga harian” merespons jobs segmen itu.', source: 'Proposisi nilai', importance: 5, evidence: 2 },
-    { id: 'bmc-a3', lens: 'feasibility', text: 'Standar rasa nasional dan layanan di bawah 180 detik bisa dijaga di banyak gerai compact.', source: 'Aktivitas dan sumber daya', importance: 4, evidence: 2 },
+    { id: 'bmc-a3', lens: 'feasibility', text: 'Standar rasa nasional bisa dijaga di banyak gerai compact; target layanan “di bawah 180 detik” adalah ilustrasi tambahan, bukan angka kasus.', source: 'Aktivitas dan sumber daya', importance: 4, evidence: 2 },
     { id: 'bmc-a4', lens: 'viability', text: 'Harga Rp 18.000 masih menutup biaya bahan, sewa gerai compact, dan biaya aplikasi dengan margin yang berulang.', source: 'Pendapatan dan biaya', importance: 5, evidence: 1 },
   ],
 };
@@ -398,7 +398,7 @@ export const EXAMPLE_LEARNING_CARDS = {
       observed: '12 dari 15 narasumber menempatkan antre dan takut terlambat rapat sebagai nyeri utama. Pra-daftar mencapai 61 dalam dua minggu, tetapi beberapa orang ragu jika janji “siap saat tiba” tidak bisa dipegang. Belum ada permintaan membayar.',
       learned: 'Hipotesis nyeri antre cukup kuat untuk segmen dan kanal itu. Keinginan memakai aplikasi tampaknya bergantung pada janji waktu yang andal. Kesediaan membayar belum diketahui, jadi product-market fit belum bisa diklaim.',
       decision: 'iterate',
-      decisionNote: 'Iterasi: perkuat janji waktu di aplikasi dan uji janji “siap dalam 180 detik” pada tes berikutnya, lalu baru uji tawaran berbayar yang syaratnya transparan.',
+      decisionNote: 'Iterasi: perkuat janji waktu di aplikasi dan uji janji kecepatan grab-and-go pada tes berikutnya (target “siap dalam 180 detik” hanya ilustrasi tambahan, bukan angka kasus), lalu baru uji tawaran berbayar yang syaratnya transparan.',
     },
   ],
   bmc: [
@@ -450,10 +450,10 @@ export const TESTING_REFERENCES = [
   },
   {
     citation: 'Amarsy, N. (2014). Survival of the fittest. Strategyzer. https://www.strategyzer.com/library/survival-of-the-fittest',
-    note: 'Tiga tingkat fit; artikel ini merujuk hlm. 48–49 pada Value Proposition Design.',
+    note: 'Tiga tingkat fit; artikel ini merujuk hlm. 48–49 pada Value Proposition Design untuk cetakan yang mereka kutip; halaman dapat berbeda antarcetakan.',
   },
   {
-    citation: 'IDEO. Design thinking: desirability, feasibility, and viability.',
-    note: 'Lensa tiga kelayakan yang dipakai di modul ini untuk mengelompokkan hipotesis.',
+    citation: 'IDEO.org. Design Kit (Human-Centered Design). https://www.designkit.org',
+    note: 'Sumber lensa desirability, feasibility, dan viability. Ketiga lensa itu disebut, misalnya, dalam metode Design Kit “Explore Scalability”: https://www.designkit.org/methods/explore-scalability.html',
   },
 ];

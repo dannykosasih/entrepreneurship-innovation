@@ -153,7 +153,7 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
         </p>
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginTop: '1rem' }}>
           <button type="button" className="btn btn-primary" onClick={handleLoadExample} style={{ fontSize: '0.8rem' }}>
-            <Sparkles size={14} /> Muat contoh Kartu Tes Kopi AJIB
+            <Sparkles size={14} /> Muat contoh ilustrasi Kartu Tes Kopi AJIB
           </button>
           <button type="button" className="btn btn-outline" onClick={handleExtract} style={{ fontSize: '0.8rem' }}>
             Turunkan hipotesis dari kanvas
