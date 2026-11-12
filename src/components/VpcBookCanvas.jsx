@@ -1,74 +1,49 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Plus, Trash2, Link2 } from 'lucide-react';
 import { JOB_KINDS, VPD_BLOCKS } from '../data/vpdCanvasData';
-import { LINK_KINDS } from '../lib/vpdFit';
 import { CanvasIcon, VPC_BLOCK_ICONS } from './CanvasIcon';
 import '../vpc-canvas.css';
 
 const VALUE_SEGMENTS = [
-  { key: 'gainCreators', kind: 'gain-creator', targetKey: 'gains', targetLabel: 'manfaat', placeholder: 'Contoh: lokasi gerai di jalur commuting...', className: 'vpc-seg-gain-creators' },
-  { key: 'painRelievers', kind: 'pain-reliever', targetKey: 'pains', targetLabel: 'nyeri', placeholder: 'Contoh: pesan duluan agar tidak antre...', className: 'vpc-seg-pain-relievers' },
-  { key: 'products', kind: 'job-product', targetKey: 'jobs', targetLabel: 'pekerjaan', placeholder: 'Contoh: aplikasi pesan-ambil...', className: 'vpc-seg-products' },
+  { key: 'products', kind: 'job-product', className: 'vpc-seg-products' },
+  { key: 'gainCreators', kind: 'gain-creator', className: 'vpc-seg-gain-creators' },
+  { key: 'painRelievers', kind: 'pain-reliever', className: 'vpc-seg-pain-relievers' },
 ];
 
 const CUSTOMER_SEGMENTS = [
-  { key: 'gains', kind: 'gain-creator', sourceKey: 'gainCreators', className: 'vpc-seg-gains' },
-  { key: 'pains', kind: 'pain-reliever', sourceKey: 'painRelievers', className: 'vpc-seg-pains' },
-  { key: 'jobs', kind: 'job-product', sourceKey: 'products', className: 'vpc-seg-jobs' },
+  { key: 'jobs', kind: 'job-product', className: 'vpc-seg-jobs' },
+  { key: 'gains', kind: 'gain-creator', className: 'vpc-seg-gains' },
+  { key: 'pains', kind: 'pain-reliever', className: 'vpc-seg-pains' },
 ];
 
-const VALUE_KEYS = new Set(VALUE_SEGMENTS.map((segment) => segment.key));
-
-function SegmentComposer({ label, placeholder, onAdd, extra = null }) {
-  const [text, setText] = useState('');
-  const [extraValue, setExtraValue] = useState(extra ? extra.defaultValue : '');
-
-  const submit = () => {
-    const value = text.trim();
-    if (!value) return;
-    onAdd(value, extraValue);
-    setText('');
-  };
-
+function GiftMark() {
   return (
-    <div className="vpc-composer">
-      {extra && (
-        <select
-          value={extraValue}
-          onChange={(event) => setExtraValue(event.target.value)}
-          aria-label={extra.label}
-        >
-          {extra.options.map((option) => (
-            <option key={option.id} value={option.id}>{option.label}</option>
-          ))}
-        </select>
-      )}
-      <input
-        type="text"
-        placeholder={placeholder}
-        aria-label={label}
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        onKeyDown={(event) => { if (event.key === 'Enter') submit(); }}
+    <svg className="vpc-center-svg" viewBox="0 0 32 32" aria-hidden="true">
+      <rect x="6" y="13" width="20" height="14" rx="1.4" fill="#fff" stroke="#14134b" strokeWidth="1.7" />
+      <rect x="5" y="9" width="22" height="5" rx="1" fill="#fff" stroke="#14134b" strokeWidth="1.7" />
+      <path d="M16 9.2v17.8" fill="none" stroke="#14134b" strokeWidth="1.7" />
+      <path
+        d="M16 9.2c-3.4-4.2-7.4-1.1-4.1 2.1 1.6 1.5 4.1-2.1 4.1-2.1 3.4-4.2 7.4-1.1 4.1 2.1C18.5 12.8 16 9.2 16 9.2z"
+        fill="none"
+        stroke="#14134b"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
       />
-      <button type="button" onClick={submit} aria-label={`Tambah ${label}`}>
-        <Plus size={12} /> Tambah
-      </button>
-    </div>
+    </svg>
   );
 }
 
-function StickyNote({
-  item,
-  listKey,
-  kind,
-  selected,
-  isPartner,
-  isUnaddressed,
-  isUnused,
-  onSelect,
-  onRemove,
-}) {
+function FaceMark() {
+  return (
+    <svg className="vpc-center-svg" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="16" cy="16" r="13" fill="#fff" stroke="#14134b" strokeWidth="1.7" />
+      <circle cx="13" cy="14.2" r="1.35" fill="#14134b" />
+      <path d="M8.2 16.2 L5.6 16.2 L8.2 18.4" fill="none" stroke="#14134b" strokeWidth="1.55" strokeLinejoin="round" strokeLinecap="round" />
+      <path d="M11.2 19.6 Q14.2 22 17.2 19.4" fill="none" stroke="#14134b" strokeWidth="1.45" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function DisplaySticky({ item, listKey, selected, isPartner, isUnaddressed, isUnused, onSelect }) {
   const jobKind = item.kind ? JOB_KINDS.find((job) => job.id === item.kind) : null;
   const classes = [
     'vpc-sticky',
@@ -80,59 +55,89 @@ function StickyNote({
   ].filter(Boolean).join(' ');
 
   return (
-    <div
+    <button
+      type="button"
       className={classes}
       data-sticky-id={item.id}
-      style={{ display: 'flex' }}
+      onClick={() => onSelect(item.id)}
+      aria-pressed={selected}
+      aria-label={`${item.text}${selected ? ' (disorot)' : ''}`}
     >
-      <button
-        type="button"
-        onClick={() => onSelect(item, listKey, kind)}
-        aria-pressed={selected}
-        aria-label={`${item.text}${selected ? ' (dipilih)' : ''}`}
-        style={{
-          appearance: 'none',
-          background: 'none',
-          border: 0,
-          padding: 0,
-          margin: 0,
-          textAlign: 'left',
-          cursor: 'pointer',
-          flex: 1,
-          minWidth: 0,
-          font: 'inherit',
-          color: 'inherit',
-        }}
-      >
-        {jobKind && <span className="sticky-kind">{jobKind.label}</span>}
-        <span>{item.text}</span>
-      </button>
-      <button
-        type="button"
-        className="vpc-sticky-remove"
-        onClick={() => onRemove(listKey, item.id)}
-        aria-label={`Hapus ${item.text}`}
-      >
-        <Trash2 size={11} />
-      </button>
+      {jobKind && <span className="sticky-kind">{jobKind.label}</span>}
+      <span>{item.text}</span>
+    </button>
+  );
+}
+
+function SegmentDisplay({
+  segment,
+  side,
+  canvas,
+  selectedId,
+  partnerIds,
+  unaddressedIds,
+  unusedIds,
+  onSelect,
+  onHover,
+}) {
+  const block = VPD_BLOCKS[segment.key];
+  const shortEn = {
+    jobs: 'Customer Jobs',
+    pains: 'Pains',
+    gains: 'Gains',
+    products: 'Products & Services',
+    painRelievers: 'Pain Relievers',
+    gainCreators: 'Gain Creators',
+  }[segment.key] || block.en;
+  const items = canvas[segment.key];
+
+  return (
+    <div className={`vpc-segment ${segment.className}`}>
+      <div className="vpc-seg-body">
+        <div className="vpc-segment-head">
+          <span className="canvas-icon-badge">
+            <CanvasIcon name={VPC_BLOCK_ICONS[segment.key]} size={18} />
+          </span>
+          <h3>
+            {segment.key === 'products' ? <>Products &amp;<br />Services</> : shortEn}
+            <small>{block.idLabel}</small>
+          </h3>
+        </div>
+        <div
+          className="vpc-stickies"
+          onMouseLeave={() => onHover(null)}
+        >
+          {items.length === 0 && (
+            <p className="vpc-empty-seg">Belum ada isian di formulir.</p>
+          )}
+          {items.map((item) => (
+            <div key={item.id} onMouseEnter={() => onHover(item.id)}>
+              <DisplaySticky
+                item={item}
+                listKey={segment.key}
+                selected={selectedId === item.id}
+                isPartner={partnerIds.has(item.id)}
+                isUnaddressed={side === 'customer' && unaddressedIds.has(item.id)}
+                isUnused={side === 'value' && unusedIds.has(item.id)}
+                onSelect={onSelect}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
-export function VpcBookCanvas({
-  canvas,
-  fit,
-  onAddItem,
-  onRemoveItem,
-  onToggleLink,
-}) {
+export function VpcBookCanvas({ canvas, fit }) {
   const rootRef = useRef(null);
-  const [selected, setSelected] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
   const [hoverId, setHoverId] = useState(null);
   const [lines, setLines] = useState([]);
 
+  const activeId = selectedId || hoverId;
+
   const partnerIds = useMemo(() => {
-    const activeId = selected?.id || hoverId;
     if (!activeId) return new Set();
     return new Set(
       canvas.links
@@ -140,7 +145,7 @@ export function VpcBookCanvas({
         .flatMap((link) => [link.customerId, link.valueId])
         .filter((id) => id !== activeId)
     );
-  }, [canvas.links, selected, hoverId]);
+  }, [canvas.links, activeId]);
 
   const unaddressedIds = useMemo(() => new Set([
     ...fit.categories.jobs.unaddressed.map((item) => item.id),
@@ -157,7 +162,6 @@ export function VpcBookCanvas({
   useEffect(() => {
     const update = () => {
       const root = rootRef.current;
-      const activeId = selected?.id || hoverId;
       if (!root || !activeId) {
         setLines([]);
         return;
@@ -193,31 +197,11 @@ export function VpcBookCanvas({
       window.removeEventListener('resize', update);
       window.removeEventListener('scroll', update, true);
     };
-  }, [canvas, selected, hoverId]);
+  }, [canvas, activeId]);
 
-  const handleSelect = (item, listKey, kind) => {
-    if (!selected) {
-      setSelected({ id: item.id, listKey, kind, text: item.text });
-      return;
-    }
-    if (selected.id === item.id) {
-      setSelected(null);
-      return;
-    }
-    const selectedIsValue = VALUE_KEYS.has(selected.listKey);
-    const thisIsValue = VALUE_KEYS.has(listKey);
-    if (selected.kind === kind && selectedIsValue !== thisIsValue) {
-      const customerId = thisIsValue ? selected.id : item.id;
-      const valueId = thisIsValue ? item.id : selected.id;
-      onToggleLink(kind, customerId, valueId);
-      return;
-    }
-    setSelected({ id: item.id, listKey, kind, text: item.text });
+  const handleSelect = (id) => {
+    setSelectedId((current) => (current === id ? null : id));
   };
-
-  const selectedTargets = selected && VALUE_KEYS.has(selected.listKey)
-    ? canvas[LINK_KINDS[selected.kind]?.customerKey] || []
-    : [];
 
   const strokeFor = (kind) => {
     if (kind === 'gain-creator') return '#168567';
@@ -225,51 +209,24 @@ export function VpcBookCanvas({
     return '#1266B1';
   };
 
-  const renderSegment = (segment, side) => {
-    const block = VPD_BLOCKS[segment.key];
-    return (
-      <div key={segment.key} className={`vpc-segment ${segment.className}`}>
-        <div className="vpc-segment-head">
-          <span className="canvas-icon-badge">
-            <CanvasIcon name={VPC_BLOCK_ICONS[segment.key]} size={20} />
-          </span>
-          <h3>
-            {block.en}
-            <small>{block.idLabel}</small>
-          </h3>
-        </div>
-        <div
-          className="vpc-stickies"
-          onMouseLeave={() => setHoverId(null)}
-        >
-          {canvas[segment.key].map((item) => (
-            <div
-              key={item.id}
-              onMouseEnter={() => setHoverId(item.id)}
-            >
-              <StickyNote
-                item={item}
-                listKey={segment.key}
-                kind={segment.kind}
-                selected={selected?.id === item.id}
-                isPartner={partnerIds.has(item.id)}
-                isUnaddressed={side === 'customer' && unaddressedIds.has(item.id)}
-                isUnused={side === 'value' && unusedIds.has(item.id)}
-                onSelect={handleSelect}
-                onRemove={onRemoveItem}
-              />
-            </div>
-          ))}
-        </div>
-        <SegmentComposer
-          label={block.idLabel}
-          placeholder={segment.placeholder || `Tambah ${block.idLabel.toLowerCase()}...`}
-          onAdd={(text, kind) => onAddItem(segment.key, text, kind)}
-          extra={segment.key === 'jobs' ? { label: 'Jenis pekerjaan', defaultValue: 'functional', options: JOB_KINDS } : null}
-        />
-      </div>
-    );
-  };
+  const highlighted = activeId
+    ? [...VALUE_SEGMENTS, ...CUSTOMER_SEGMENTS]
+      .flatMap((segment) => canvas[segment.key].map((item) => ({ ...item, key: segment.key })))
+      .find((item) => item.id === activeId)
+    : null;
+
+  const partners = highlighted
+    ? canvas.links
+      .filter((link) => link.customerId === highlighted.id || link.valueId === highlighted.id)
+      .map((link) => {
+        const otherId = link.customerId === highlighted.id ? link.valueId : link.customerId;
+        const other = [...VALUE_SEGMENTS, ...CUSTOMER_SEGMENTS]
+          .flatMap((segment) => canvas[segment.key])
+          .find((item) => item.id === otherId);
+        return other?.text;
+      })
+      .filter(Boolean)
+    : [];
 
   return (
     <section className="vpc-book-wrap" aria-labelledby="vpc-book-title">
@@ -277,14 +234,16 @@ export function VpcBookCanvas({
         <div>
           <h2 id="vpc-book-title">Kanvas Proposisi Nilai, bentuk buku</h2>
           <p>
-            Tata letak mengikuti Value Proposition Design: Peta Nilai berbentuk persegi di kiri
-            (Pencipta Manfaat, Pereda Nyeri, Produk &amp; Layanan) dan Profil Pelanggan berbentuk
-            lingkaran di kanan (Manfaat, Nyeri, Pekerjaan Pelanggan). Digambar ulang; ikon orisinal DeKa.
+            Tata letak mengikuti Value Proposition Canvas resmi Strategyzer (Osterwalder dan rekan):
+            Peta Nilai berbentuk persegi di kiri, Profil Pelanggan berbentuk lingkaran di kanan.
+            Kanvas ini hanya menampilkan hasil isian formulir — tambah, hapus, dan tautan dikerjakan
+            di formulir. Digambar ulang dengan CSS/SVG orisinal; ikon garis DeKa.
           </p>
         </div>
       </div>
       <p className="vpc-book-hint">
-        Pilih tempelan di satu sisi, lalu klik pasangan yang sesuai di sisi lain untuk menautkan atau melepasnya. Arahkan kursor untuk melihat garis kecocokan. Tempelan yang belum tertangani diberi tepi merah lembut.
+        Arahkan kursor atau klik tempelan untuk menyorot pasangannya. Tempelan pelanggan yang belum
+        tertaut diberi tepi merah lembut. Item peta nilai yang belum tertaut sedikit diredupkan.
       </p>
 
       <div className="vpc-book" ref={rootRef}>
@@ -294,82 +253,76 @@ export function VpcBookCanvas({
           ))}
         </svg>
 
-        <section
-          className="vpc-value-map"
-          aria-label="Peta Nilai (Value Map)"
-        >
-          {VALUE_SEGMENTS.map((segment) => renderSegment(segment, 'value'))}
+        <section className="vpc-value-map" aria-label="Peta Nilai (Value Map)">
+          <svg className="vpc-dividers" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <line x1="0" y1="0" x2="50" y2="50" />
+            <line x1="0" y1="100" x2="50" y2="50" />
+            <line x1="50" y1="50" x2="100" y2="50" />
+          </svg>
+          {VALUE_SEGMENTS.map((segment) => (
+            <SegmentDisplay
+              key={segment.key}
+              segment={segment}
+              side="value"
+              canvas={canvas}
+              selectedId={selectedId}
+              partnerIds={partnerIds}
+              unaddressedIds={unaddressedIds}
+              unusedIds={unusedIds}
+              onSelect={handleSelect}
+              onHover={setHoverId}
+            />
+          ))}
+          <div className="vpc-center-mark" aria-hidden="true">
+            <GiftMark />
+          </div>
         </section>
 
         <div className="vpc-fit-bridge" aria-hidden="true">
+          <span className="vpc-fit-chevrons" title="Pencipta manfaat menghadap manfaat">
+            <i className="vpc-chevron vpc-chevron-right" />
+            <i className="vpc-chevron vpc-chevron-left" />
+          </span>
           <strong>FIT</strong>
-          <span>Peta nilai menempel pada profil pelanggan</span>
+          <span className="vpc-fit-chevrons" title="Pereda nyeri menghadap nyeri">
+            <i className="vpc-chevron vpc-chevron-right" />
+            <i className="vpc-chevron vpc-chevron-left" />
+          </span>
         </div>
 
-        <section
-          className="vpc-profile"
-          aria-label="Profil Pelanggan (Customer Profile)"
-        >
-          {CUSTOMER_SEGMENTS.map((segment) => renderSegment(segment, 'customer'))}
+        <section className="vpc-profile" aria-label="Profil Pelanggan (Customer Profile)">
+          <svg className="vpc-dividers" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <line x1="0" y1="50" x2="50" y2="50" />
+            <line x1="50" y1="50" x2="85.355" y2="14.645" />
+            <line x1="50" y1="50" x2="85.355" y2="85.355" />
+          </svg>
+          {CUSTOMER_SEGMENTS.map((segment) => (
+            <SegmentDisplay
+              key={segment.key}
+              segment={segment}
+              side="customer"
+              canvas={canvas}
+              selectedId={selectedId}
+              partnerIds={partnerIds}
+              unaddressedIds={unaddressedIds}
+              unusedIds={unusedIds}
+              onSelect={handleSelect}
+              onHover={setHoverId}
+            />
+          ))}
+          <div className="vpc-center-mark" aria-hidden="true">
+            <FaceMark />
+          </div>
         </section>
       </div>
 
-      <div className="vpc-match-panel">
-        <h3>
-          <Link2 size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />
-          Mencocokkan tempelan
-        </h3>
-        {!selected && (
-          <p>Belum ada tempelan yang dipilih. Klik satu item di peta nilai atau profil pelanggan untuk mulai menautkan.</p>
-        )}
-        {selected && (
-          <>
-            <p>
-              Dipilih: <strong>{selected.text}</strong>
-              {VALUE_KEYS.has(selected.listKey)
-                ? ' — klik nyeri, manfaat, atau pekerjaan yang sesuai, atau gunakan kotak centang di bawah.'
-                : ' — klik item peta nilai yang sesuai untuk menautkan atau melepasnya.'}
-            </p>
-            {VALUE_KEYS.has(selected.listKey) && (
-              selectedTargets.length === 0 ? (
-                <p>Tambah item di sisi profil pelanggan untuk mulai mencocokkan.</p>
-              ) : (
-                <fieldset style={{ border: 0, padding: 0 }}>
-                  <legend style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
-                    Cocokkan ke {VALUE_SEGMENTS.find((segment) => segment.key === selected.listKey)?.targetLabel}
-                  </legend>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                    {selectedTargets.map((target) => {
-                      const checked = canvas.links.some((link) => (
-                        link.kind === selected.kind && link.valueId === selected.id && link.customerId === target.id
-                      ));
-                      return (
-                        <label key={target.id} style={{ display: 'flex', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-body)' }}>
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => onToggleLink(selected.kind, target.id, selected.id)}
-                            aria-label={`Tautkan ${selected.text} ke ${target.text}`}
-                          />
-                          <span>{target.text}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
-              )
-            )}
-            <button
-              type="button"
-              className="btn btn-outline"
-              style={{ marginTop: '0.65rem', fontSize: '0.75rem' }}
-              onClick={() => setSelected(null)}
-            >
-              Tutup pilihan
-            </button>
-          </>
-        )}
-      </div>
+      <p className="vpc-highlight-readout">
+        {highlighted
+          ? partners.length
+            ? <>Disorot: <strong>{highlighted.text}</strong> — tertaut ke {partners.join('; ')}.</>
+            : <>Disorot: <strong>{highlighted.text}</strong> — belum tertaut.</>
+          : 'Kanvas hanya menampilkan hasil formulir. Klik tempelan untuk melihat tautannya.'}
+      </p>
     </section>
   );
 }

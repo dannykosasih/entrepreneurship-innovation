@@ -9,6 +9,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { VpcBookCanvas } from './VpcBookCanvas';
+import { VpcCanvasForm } from './VpcCanvasForm';
 import { TestingLab } from './TestingLab';
 import {
   EMPTY_VPD_CANVAS,
@@ -253,15 +254,19 @@ export function VpdBuilder() {
         </div>
       </div>
 
-      <FitMeter fit={fit} />
-
-      <VpcBookCanvas
+      <VpcCanvasForm
         canvas={canvas}
-        fit={fit}
         onAddItem={addItem}
         onRemoveItem={removeItem}
         onToggleLink={handleToggleLink}
       />
+
+      <VpcBookCanvas
+        canvas={canvas}
+        fit={fit}
+      />
+
+      <FitMeter fit={fit} />
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.75rem' }}>Tiga tingkat kecocokan</h2>

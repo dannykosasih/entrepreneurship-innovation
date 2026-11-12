@@ -110,16 +110,26 @@ describe('Neon Nights LMS regression', () => {
   });
 
 
-  it('renders the book-shaped Value Proposition Canvas and keeps matching plus fit score', async () => {
+  it('renders the book-shaped Value Proposition Canvas as a display of form inputs', async () => {
     const user=userEvent.setup();render(<App/>);
     await user.click(nav('Explore & tools','VPD Proposisi Nilai'));
+    expect(screen.getByRole('heading',{name:'Isi kanvas lewat formulir'})).toBeInTheDocument();
     expect(screen.getByRole('region',{name:'Peta Nilai (Value Map)'})).toBeInTheDocument();
     expect(screen.getByRole('region',{name:'Profil Pelanggan (Customer Profile)'})).toBeInTheDocument();
     expect(screen.getByRole('heading',{name:'Kanvas Proposisi Nilai, bentuk buku'})).toBeInTheDocument();
     await user.click(screen.getByRole('button',{name:'Muat contoh ilustrasi Kopi AJIB'}));
     expect(screen.getByText('100%')).toBeInTheDocument();
-    expect(screen.getByRole('button',{name:'Antre panjang di kafe pada jam berangkat kerja.'})).toBeInTheDocument();
-    expect(screen.getByRole('button',{name:'Pesan duluan lewat aplikasi sehingga tidak perlu antre di gerai.'})).toBeInTheDocument();
+    const profile=screen.getByRole('region',{name:'Profil Pelanggan (Customer Profile)'});
+    const valueMap=screen.getByRole('region',{name:'Peta Nilai (Value Map)'});
+    expect(profile).toHaveTextContent('Antre panjang di kafe pada jam berangkat kerja.');
+    expect(valueMap).toHaveTextContent('Pesan duluan lewat aplikasi sehingga tidak perlu antre di gerai.');
+    expect(profile.querySelector('.vpc-composer')).toBeNull();
+    expect(valueMap.querySelector('.vpc-composer')).toBeNull();
+    await user.type(screen.getByPlaceholderText('Contoh: mendapatkan kafein berkualitas sebelum rapat...'),'Tes pekerjaan formulir');
+    await user.click(screen.getByRole('button',{name:'Tambah pekerjaan pelanggan'}));
+    expect(profile).toHaveTextContent('Tes pekerjaan formulir');
+    const stored=JSON.parse(localStorage.getItem('innoventures_vpd_canvas'));
+    expect(stored.jobs.some((job)=>job.text==='Tes pekerjaan formulir')).toBe(true);
   });
 
   it('saves interactive Test Cards from Cara Menguji on the VPD tool', async () => {
