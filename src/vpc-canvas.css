@@ -10,6 +10,7 @@
   --icon-accent: #00e1ff;
   flex-shrink: 0;
   line-height: 0;
+  overflow: visible;
 }
 .canvas-icon svg {
   width: 100%;
@@ -252,30 +253,30 @@
   clip-path: polygon(0 0, 50% 50%, 0 100%);
 }
 .vpc-seg-products .vpc-seg-body {
-  left: 2%;
-  top: 26%;
-  width: 36%;
-  height: 48%;
+  left: 3%;
+  top: 34%;
+  width: 24%;
+  height: 32%;
 }
 .vpc-seg-gain-creators {
   background: #eefaf3;
   clip-path: polygon(0 0, 100% 0, 100% 50%, 50% 50%);
 }
 .vpc-seg-gain-creators .vpc-seg-body {
-  left: 28%;
-  top: 2.5%;
-  width: 69%;
-  height: 38%;
+  left: 40%;
+  top: 3%;
+  width: 57%;
+  height: 34%;
 }
 .vpc-seg-pain-relievers {
   background: #fff4ee;
   clip-path: polygon(0 100%, 100% 100%, 100% 50%, 50% 50%);
 }
 .vpc-seg-pain-relievers .vpc-seg-body {
-  left: 28%;
-  bottom: 2.5%;
-  width: 69%;
-  height: 38%;
+  left: 48%;
+  bottom: 3.5%;
+  width: 49%;
+  height: 34%;
 }
 
 /* Official Customer Profile: right wedge = Jobs; upper-left = Gains; lower-left = Pains */
@@ -284,30 +285,32 @@
   clip-path: polygon(50% 50%, 100% 0, 100% 100%);
 }
 .vpc-seg-jobs .vpc-seg-body {
-  right: 5%;
-  top: 28%;
-  width: 32%;
-  height: 44%;
+  right: 9%;
+  top: 38%;
+  width: 20%;
+  height: 24%;
+  align-items: flex-end;
+  text-align: right;
 }
 .vpc-seg-gains {
   background: #e8f6d8;
   clip-path: polygon(0 0, 100% 0, 50% 50%, 0 50%);
 }
 .vpc-seg-gains .vpc-seg-body {
-  left: 14%;
-  top: 9%;
-  width: 48%;
-  height: 34%;
+  left: 28%;
+  top: 15%;
+  width: 42%;
+  height: 28%;
 }
 .vpc-seg-pains {
   background: #ffe4e2;
   clip-path: polygon(0 100%, 100% 100%, 50% 50%, 0 50%);
 }
 .vpc-seg-pains .vpc-seg-body {
-  left: 14%;
-  bottom: 9%;
-  width: 48%;
-  height: 34%;
+  left: 28%;
+  bottom: 15%;
+  width: 42%;
+  height: 28%;
 }
 
 .vpc-center-mark {
@@ -339,6 +342,23 @@
   position: relative;
   z-index: 4;
   flex-shrink: 0;
+}
+.vpc-book .canvas-icon-badge {
+  width: 28px;
+  height: 28px;
+}
+.vpc-seg-products .vpc-segment-head,
+.vpc-seg-jobs .vpc-segment-head {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+.vpc-seg-jobs .vpc-segment-head {
+  align-items: flex-end;
+  text-align: right;
+}
+.vpc-seg-jobs .vpc-stickies {
+  justify-content: flex-end;
 }
 .vpc-segment-head h3 {
   font-size: 0.68rem;
@@ -653,8 +673,41 @@
     grid-template-columns: unset;
   }
   .vpc-book { grid-template-columns: minmax(0, 1fr) !important; }
-  .vpc-seg-products .vpc-seg-body,
-  .vpc-seg-jobs .vpc-seg-body { width: 36%; }
-  .vpc-seg-gains .vpc-seg-body,
-  .vpc-seg-pains .vpc-seg-body { left: 10%; width: 48%; }
+  .vpc-book .canvas-icon-badge { width: 24px; height: 24px; }
+  .vpc-seg-products .vpc-seg-body {
+    left: 3%;
+    top: 34%;
+    width: 22%;
+    height: 32%;
+  }
+  .vpc-seg-gain-creators .vpc-seg-body {
+    left: 42%;
+    top: 3%;
+    width: 55%;
+    height: 32%;
+  }
+  .vpc-seg-pain-relievers .vpc-seg-body {
+    left: 50%;
+    bottom: 4%;
+    width: 47%;
+    height: 32%;
+  }
+  .vpc-seg-jobs .vpc-seg-body {
+    right: 10%;
+    top: 38%;
+    width: 18%;
+    height: 24%;
+  }
+  .vpc-seg-gains .vpc-seg-body {
+    left: 30%;
+    top: 16%;
+    width: 40%;
+    height: 26%;
+  }
+  .vpc-seg-pains .vpc-seg-body {
+    left: 30%;
+    bottom: 16%;
+    width: 40%;
+    height: 26%;
+  }
 }
