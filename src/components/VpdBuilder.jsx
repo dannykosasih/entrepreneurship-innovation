@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Plus,
-  Trash2,
   RotateCcw,
   Sparkles,
   BookOpen,
@@ -10,6 +8,9 @@ import {
   CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
+import { VpcBookCanvas } from './VpcBookCanvas';
+import { VpcCanvasForm } from './VpcCanvasForm';
+import { TestingLab } from './TestingLab';
 import {
   EMPTY_VPD_CANVAS,
   EXAMPLE_VPD_CANVAS,
@@ -29,17 +30,6 @@ import {
   toggleLink,
 } from '../lib/vpdFit';
 
-const CUSTOMER_FIELDS = [
-  { key: 'jobs', kind: 'job-product', placeholder: 'Contoh: mendapatkan kopi cepat sebelum rapat...' },
-  { key: 'pains', kind: 'pain-reliever', placeholder: 'Contoh: antre panjang di jam berangkat kerja...' },
-  { key: 'gains', kind: 'gain-creator', placeholder: 'Contoh: pesanan sudah siap saat tiba di gerai...' },
-];
-
-const VALUE_FIELDS = [
-  { key: 'products', kind: 'job-product', targetKey: 'jobs', targetLabel: 'pekerjaan yang dibantu', placeholder: 'Contoh: aplikasi pesan-ambil...' },
-  { key: 'painRelievers', kind: 'pain-reliever', targetKey: 'pains', targetLabel: 'nyeri yang diredakan', placeholder: 'Contoh: pesan duluan agar tidak antre...' },
-  { key: 'gainCreators', kind: 'gain-creator', targetKey: 'gains', targetLabel: 'manfaat yang diciptakan', placeholder: 'Contoh: lokasi gerai di jalur commuting...' },
-];
 
 function loadStoredCanvas() {
   try {
@@ -55,7 +45,7 @@ function FitMeter({ fit }) {
   const label = !fit.hasCustomerItems
     ? 'Isi profil pelanggan terlebih dahulu'
     : fit.score >= 80
-      ? 'Kecocokan di atas kertas sudah rapat'
+      ? 'Banyak tautan sudah terpasang di atas kertas — ini belum bukti fit lapangan'
       : fit.score >= 50
         ? 'Sebagian jobs, nyeri, atau manfaat masih terbuka'
         : 'Banyak butir pelanggan belum berpasangan';
@@ -64,10 +54,10 @@ function FitMeter({ fit }) {
     <div className="card" style={{ background: 'var(--bg-surface)', borderTop: '4px solid var(--ddk-primary-blue)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
         <div>
-          <span className="badge badge-blue" style={{ marginBottom: '0.4rem' }}>Problem-Solution Fit</span>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Skor kecocokan di kanvas</h2>
+          <span className="badge badge-blue" style={{ marginBottom: '0.4rem' }}>Skor tautan di kanvas</span>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Kelengkapan tautan di atas kertas</h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.35rem', maxWidth: '36rem', lineHeight: 1.6 }}>
-            Skor merata-ratakan persentase pekerjaan, nyeri, dan manfaat yang sudah tertaut ke item di peta nilai. Ini menguji kecocokan masalah–solusi di atas kertas, bukan product-market fit di lapangan.
+            Angka ini merata-ratakan berapa banyak pekerjaan, nyeri, dan manfaat pada profil yang sudah tertaut ke item di peta nilai. Ini alat bantu kelengkapan rancangan di atas kertas. Alat ini tidak mengukur apakah butir itu penting bagi pelanggan, apakah tautannya masuk akal, atau apakah sudah ada bukti wawancara, penggunaan, atau pembayaran. Skor tinggi bukan problem-solution fit, apalagi product-market fit.
           </p>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -117,98 +107,10 @@ function FitMeter({ fit }) {
       )}
       {fit.hasCustomerItems && fit.totals.unaddressed === 0 && fit.hasLinks && (
         <p style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.9rem', fontSize: '0.85rem', color: 'var(--ddk-primary-blue)' }}>
-          <CheckCircle2 size={16} aria-hidden="true" /> Semua jobs, nyeri, dan manfaat pada profil ini sudah memiliki pasangan di peta nilai.
+          <CheckCircle2 size={16} aria-hidden="true" /> Semua butir di profil ini sudah punya pasangan di peta nilai. Itu kelengkapan rancangan, bukan bukti bahwa pelanggan peduli atau akan membeli. Utamakan butir yang penting; tidak semua keluhan kecil harus dipasangkan.
         </p>
       )}
     </div>
-  );
-}
-
-function ItemComposer({ label, placeholder, onAdd, extra = null }) {
-  const [text, setText] = useState('');
-  const [extraValue, setExtraValue] = useState(extra ? extra.defaultValue : '');
-
-  const submit = () => {
-    const value = text.trim();
-    if (!value) return;
-    onAdd(value, extraValue);
-    setText('');
-  };
-
-  return (
-    <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.7rem', flexWrap: 'wrap' }}>
-      {extra && (
-        <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-          {extra.label}
-          <select
-            value={extraValue}
-            onChange={(e) => setExtraValue(e.target.value)}
-            aria-label={extra.label}
-            style={{ padding: '0.35rem 0.45rem', fontSize: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1.5px solid var(--border-subtle)' }}
-          >
-            {extra.options.map((option) => (
-              <option key={option.id} value={option.id}>{option.label}</option>
-            ))}
-          </select>
-        </label>
-      )}
-      <input
-        type="text"
-        placeholder={placeholder}
-        aria-label={label}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
-        style={{
-          flex: 1,
-          minWidth: '140px',
-          padding: '0.4rem 0.55rem',
-          fontSize: '0.75rem',
-          borderRadius: 'var(--radius-sm)',
-          border: '1.5px solid var(--border-subtle)',
-          fontFamily: 'var(--font-body)',
-        }}
-      />
-      <button
-        type="button"
-        onClick={submit}
-        className="btn btn-primary"
-        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
-        aria-label={`Tambah ${label}`}
-      >
-        <Plus size={14} /> Tambah
-      </button>
-    </div>
-  );
-}
-
-function LinkedChecklist({ item, targets, kind, links, onToggle, targetLabel }) {
-  if (!targets.length) {
-    return <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>Tambah {targetLabel} di sisi profil pelanggan untuk mulai mencocokkan.</p>;
-  }
-  return (
-    <fieldset style={{ border: 0, marginTop: '0.4rem', padding: 0 }}>
-      <legend style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-        Cocokkan ke {targetLabel}
-      </legend>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        {targets.map((target) => {
-          const checked = links.some((link) => link.kind === kind && link.valueId === item.id && link.customerId === target.id);
-          return (
-            <label key={target.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-body)', lineHeight: 1.4 }}>
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={() => onToggle(kind, target.id, item.id)}
-                aria-label={`Tautkan ${item.text} ke ${target.text}`}
-                style={{ marginTop: '0.15rem' }}
-              />
-              <span>{target.kind ? `[${JOB_KINDS.find((job) => job.id === target.kind)?.label || target.kind}] ` : ''}{target.text}</span>
-            </label>
-          );
-        })}
-      </div>
-    </fieldset>
   );
 }
 
@@ -251,42 +153,19 @@ export function VpdBuilder() {
     setCanvas(normalizeVpdCanvas(EMPTY_VPD_CANVAS));
   };
 
-  const renderItemList = (listKey, items) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', marginTop: '0.65rem' }}>
-      {items.map((item) => (
-        <div key={item.id} style={{ background: 'var(--ddk-white)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)', padding: '0.55rem 0.65rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'flex-start' }}>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.45, fontWeight: 500 }}>
-              {item.kind && <span className="badge badge-soft" style={{ marginRight: '0.35rem', fontSize: '0.6rem' }}>{JOB_KINDS.find((job) => job.id === item.kind)?.label}</span>}
-              {item.text}
-            </p>
-            <button
-              type="button"
-              onClick={() => removeItem(listKey, item.id)}
-              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0 }}
-              aria-label={`Hapus ${item.text}`}
-            >
-              <Trash2 size={13} />
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <div className="card" style={{ background: 'var(--ddk-white)', borderTop: '4px solid var(--ddk-gold)' }}>
         <span className="badge badge-gold" style={{ marginBottom: '0.4rem' }}>Value Proposition Design</span>
         <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--ddk-dark)' }}>
-          Kanvas Proposisi Nilai (VPD)
+          Kanvas Proposisi Nilai (Value Proposition Canvas)
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginTop: '0.4rem', maxWidth: '52rem', lineHeight: 1.65 }}>
-          Value Proposition Design membesarkan dua blok Business Model Canvas: Proposisi Nilai dan Segmen Pelanggan. Cocokkan Peta Nilai dengan Profil Pelanggan — termasuk Jobs To Be Done — untuk menguji kecocokan masalah–solusi sebelum Anda mengklaim product-market fit.
+          Value Proposition Canvas, sebagaimana diajarkan dalam Value Proposition Design, membesarkan dua blok Business Model Canvas: Proposisi Nilai dan Segmen Pelanggan. Cocokkan Peta Nilai dengan Profil Pelanggan — jobs pada profil ini sejalan dengan tradisi Jobs To Be Done — untuk merancang kecocokan masalah–solusi di atas kertas, lalu uji dengan bukti pelanggan sebelum mengklaim product-market fit. Contoh Kopi AJIB diambil dari studi kasus pembelajaran kursus ini, bukan dari verifikasi independen atas perusahaan publik. Angka yang tidak ada di naskah kasus ditandai sebagai ilustrasi tambahan.
         </p>
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginTop: '1rem' }}>
           <button type="button" className="btn btn-primary" onClick={handleLoadExample} style={{ fontSize: '0.8rem' }}>
-            <Sparkles size={14} /> Muat contoh Kopi AJIB
+            <Sparkles size={14} /> Muat contoh ilustrasi Kopi AJIB
           </button>
           <button type="button" className="btn btn-outline" onClick={handleReset} style={{ fontSize: '0.8rem' }}>
             <RotateCcw size={14} /> Reset kanvas
@@ -358,7 +237,7 @@ export function VpdBuilder() {
                   <div style={{ padding: '0 1rem 1rem', background: 'var(--ddk-light-gray)' }}>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-body)', lineHeight: 1.65 }}>{block.definition}</p>
                     <p style={{ fontSize: '0.83rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginTop: '0.5rem' }}>
-                      <strong>Contoh Kopi AJIB.</strong> {block.example}
+                      {block.example}
                     </p>
                     {block.key === 'jobs' && (
                       <ul style={{ marginTop: '0.6rem', paddingLeft: '1.1rem', fontSize: '0.8rem', color: 'var(--text-body)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
@@ -375,63 +254,19 @@ export function VpdBuilder() {
         </div>
       </div>
 
+      <VpcCanvasForm
+        canvas={canvas}
+        onAddItem={addItem}
+        onRemoveItem={removeItem}
+        onToggleLink={handleToggleLink}
+      />
+
+      <VpcBookCanvas
+        canvas={canvas}
+        fit={fit}
+      />
+
       <FitMeter fit={fit} />
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <section className="card" style={{ background: 'var(--bg-surface)', borderTop: '4px solid #AF6A00' }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Peta Nilai (Value Map)</h2>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0.35rem 0 1rem', lineHeight: 1.6 }}>
-            Zoom in blok Proposisi Nilai pada BMC. Tautkan setiap item ke jobs, nyeri, atau manfaat di sebelah kanan.
-          </p>
-          {VALUE_FIELDS.map((field) => (
-            <div key={field.key} style={{ marginBottom: '1.15rem' }}>
-              <h3 style={{ fontSize: '0.92rem', color: 'var(--ddk-dark)' }}>{VPD_BLOCKS[field.key].en} · {VPD_BLOCKS[field.key].idLabel}</h3>
-              {canvas[field.key].map((item) => (
-                <div key={item.id} style={{ background: '#fffaf0', border: '1px solid #F2DF9D', borderRadius: 'var(--radius-sm)', padding: '0.6rem', marginTop: '0.45rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem' }}>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', fontWeight: 600 }}>{item.text}</p>
-                    <button type="button" onClick={() => removeItem(field.key, item.id)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0 }} aria-label={`Hapus ${item.text}`}>
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                  <LinkedChecklist
-                    item={item}
-                    targets={canvas[field.targetKey]}
-                    kind={field.kind}
-                    links={canvas.links}
-                    onToggle={handleToggleLink}
-                    targetLabel={field.targetLabel}
-                  />
-                </div>
-              ))}
-              <ItemComposer
-                label={VPD_BLOCKS[field.key].idLabel}
-                placeholder={field.placeholder}
-                onAdd={(text) => addItem(field.key, text)}
-              />
-            </div>
-          ))}
-        </section>
-
-        <section className="card" style={{ background: 'var(--bg-surface)', borderTop: '4px solid var(--ddk-primary-blue)' }}>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Profil Pelanggan · Jobs To Be Done</h2>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0.35rem 0 1rem', lineHeight: 1.6 }}>
-            Zoom in blok Segmen Pelanggan pada BMC. Sisi ini adalah kanvas pekerjaan pelanggan (JTBD) beserta nyeri dan manfaatnya.
-          </p>
-          {CUSTOMER_FIELDS.map((field) => (
-            <div key={field.key} style={{ marginBottom: '1.15rem' }}>
-              <h3 style={{ fontSize: '0.92rem', color: 'var(--ddk-dark)' }}>{VPD_BLOCKS[field.key].en} · {VPD_BLOCKS[field.key].idLabel}</h3>
-              {renderItemList(field.key, canvas[field.key])}
-              <ItemComposer
-                label={VPD_BLOCKS[field.key].idLabel}
-                placeholder={field.placeholder}
-                onAdd={(text, kind) => addItem(field.key, text, kind)}
-                extra={field.key === 'jobs' ? { label: 'Jenis pekerjaan', defaultValue: 'functional', options: JOB_KINDS } : null}
-              />
-            </div>
-          ))}
-        </section>
-      </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.75rem' }}>Tiga tingkat kecocokan</h2>
@@ -446,6 +281,8 @@ export function VpdBuilder() {
           ))}
         </div>
       </div>
+
+      <TestingLab scope="vpd" canvas={canvas} />
 
       <div className="card" style={{ background: 'var(--bg-surface)', borderLeft: '4px solid var(--ddk-gold)' }}>
         <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.65rem' }}>{VPD_BMC_RELATION.title}</h2>
@@ -470,7 +307,7 @@ export function VpdBuilder() {
           ))}
         </ul>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.9rem', lineHeight: 1.55 }}>
-          Value Proposition Canvas adalah kerangka kerja Strategyzer (Osterwalder, Pigneur, Bernarda, dan Smith), digunakan di sini untuk tujuan pembelajaran dengan atribusi. Nomor halaman tidak dicantumkan karena berbeda antarcetakan.
+          Value Proposition Canvas adalah kerangka kerja Strategyzer (Osterwalder, Pigneur, Bernarda, dan Smith), digunakan di sini untuk tujuan pembelajaran dengan atribusi. Bagian Canvas dikutip sebagai §1.1–§1.3. Nomor halaman cetak tidak dipaksakan karena dapat berbeda antarcetakan.
         </p>
       </div>
     </div>

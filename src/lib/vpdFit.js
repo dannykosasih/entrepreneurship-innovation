@@ -38,7 +38,7 @@ export function normalizeVpdCanvas(raw) {
           .map((item) => ({
             id: typeof item.id === 'string' && item.id ? item.id : createItemId(key),
             text: item.text,
-            ...(key === 'jobs' ? { kind: ['functional', 'social', 'emotional'].includes(item.kind) ? item.kind : 'functional' } : {}),
+            ...(key === 'jobs' ? { kind: ['functional', 'social', 'emotional', 'supporting'].includes(item.kind) ? item.kind : 'functional' } : {}),
           }))
       : [];
   }
