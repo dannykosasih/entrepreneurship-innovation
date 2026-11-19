@@ -1,29 +1,22 @@
 import React, { useState } from 'react';
-import { CASE_STUDIES } from '../data/caseStudiesData';
+import { getCaseStudies } from '../data/caseStudiesData';
 import { useLanguage } from '../context/LanguageContext';
 import { 
-  Building2, 
-  TrendingUp, 
-  Cpu, 
-  ShieldAlert, 
   MessageSquare, 
   CheckCircle, 
   Eye, 
-  DollarSign, 
-  Clock, 
-  Sparkles 
+  Clock 
 } from 'lucide-react';
 
 export function CaseStudies({ onMarkCaseComplete, completedCases }) {
-  const { isEn } = useLanguage();
-  const [selectedCaseId, setSelectedCaseId] = useState(CASE_STUDIES[0].id);
+  const { lang, isEn } = useLanguage();
+  const caseStudies = getCaseStudies(lang);
+  const [selectedCaseId, setSelectedCaseId] = useState(caseStudies[0].id);
   const [userAnswers, setUserAnswers] = useState({});
   const [revealedGuidance, setRevealedGuidance] = useState({});
 
-  const currentCase = CASE_STUDIES.find(c => c.id === selectedCaseId) || CASE_STUDIES[0];
+  const currentCase = caseStudies.find(c => c.id === selectedCaseId) || caseStudies[0];
   const isDone = completedCases.includes(currentCase.id);
-
-  const formatMetric = (text) => (isEn ? text.replace(/Rp Miliar/g, 'IDR Billion') : text);
 
   const handleAnswerChange = (idx, text) => {
     setUserAnswers(prev => ({ ...prev, [`${currentCase.id}-${idx}`]: text }));
@@ -35,6 +28,9 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
       [`${currentCase.id}-${idx}`]: !prev[`${currentCase.id}-${idx}`]
     }));
   };
+
+  const isEbitRow = (metric) => metric.includes('Operating Income') || metric.includes('Laba Operasional');
+  const isGrossProfitRow = (metric) => metric.includes('Gross Profit') || metric.includes('Laba Kotor');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -62,13 +58,15 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
             style={{ flexShrink: 0 }}
           >
             <CheckCircle size={16} />
-            {isDone ? 'Case Study Completed ✓' : 'Mark Case as Completed'}
+            {isDone
+              ? (isEn ? 'Case Study Completed ✓' : 'Studi Kasus Selesai ✓')
+              : (isEn ? 'Mark Case as Completed' : 'Tandai Kasus Selesai')}
           </button>
         </div>
 
         {/* Case Switcher Tabs */}
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem' }}>
-          {CASE_STUDIES.map(cs => (
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem', flexWrap: 'wrap' }}>
+          {caseStudies.map(cs => (
             <button
               key={cs.id}
               onClick={() => setSelectedCaseId(cs.id)}
@@ -99,20 +97,57 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
           gap: '1rem'
         }}>
           <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--ddk-primary-blue)' }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>FOUNDED</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
+              {isEn ? 'FOUNDED' : 'DIDIRIKAN'}
+            </div>
             <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>{currentCase.context.founded}</div>
           </div>
           <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--ddk-gold)' }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>NATIONAL SCALE</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
+              {isEn ? 'NATIONAL SCALE' : 'SKALA NASIONAL'}
+            </div>
             <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>{currentCase.context.outlets}</div>
           </div>
           <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--ddk-soft-blue)' }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>TOTAL EMPLOYEES</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
+              {isEn ? 'TOTAL EMPLOYEES' : 'TOTAL KARYAWAN'}
+            </div>
             <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>{currentCase.context.employees}</div>
           </div>
           <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--ddk-primary-blue)' }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>PARADIGM</div>
-            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ddk-primary-blue)', fontFamily: 'var(--font-heading)' }}>App-First New Retail + AI</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
+              {isEn ? 'PARADIGM' : 'PARADIGMA'}
+            </div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ddk-primary-blue)', fontFamily: 'var(--font-heading)' }}>
+              {isEn ? 'App-First New Retail + AI' : 'New Retail Berbasis Aplikasi + AI'}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedCaseId === 'case-ai-synthetic-persona' && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '1rem'
+        }}>
+          <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--ddk-primary-blue)' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
+              {isEn ? 'FRAMEWORK' : 'KERANGKA KERJA'}
+            </div>
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>{currentCase.context.framework}</div>
+          </div>
+          <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--ddk-gold)' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
+              {isEn ? 'TARGET AUDIENCE' : 'TARGET PESERTA'}
+            </div>
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>{currentCase.context.targetAudience}</div>
+          </div>
+          <div className="card" style={{ padding: '1rem', borderLeft: '4px solid var(--ddk-soft-blue)' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
+              {isEn ? 'CORE TOOLING' : 'PERANGKAT INTI'}
+            </div>
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>{currentCase.context.tooling}</div>
           </div>
         </div>
       )}
@@ -134,7 +169,9 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
                   <thead>
                     <tr style={{ background: 'var(--ddk-dark)', color: 'white', fontFamily: 'var(--font-heading)' }}>
-                      <th style={{ padding: '0.85rem', textAlign: 'left', fontWeight: 700 }}>Financial Metric (IDR)</th>
+                      <th style={{ padding: '0.85rem', textAlign: 'left', fontWeight: 700 }}>
+                        {isEn ? 'Financial Metric (IDR)' : 'Metrik Keuangan (Rp)'}
+                      </th>
                       <th style={{ padding: '0.85rem', textAlign: 'right', fontWeight: 700 }}>2021</th>
                       <th style={{ padding: '0.85rem', textAlign: 'right', fontWeight: 700 }}>2022</th>
                       <th style={{ padding: '0.85rem', textAlign: 'right', fontWeight: 700 }}>2023</th>
@@ -147,15 +184,15 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                         key={rIdx} 
                         style={{ 
                           borderBottom: '1px solid var(--border-subtle)',
-                          background: row.metric.includes('Operating Income') ? 'var(--ddk-gold-subtle)' : rIdx % 2 === 1 ? 'var(--ddk-light-gray)' : 'white',
-                          fontWeight: row.metric.includes('Operating Income') || row.metric.includes('Gross Profit') ? 700 : 400
+                          background: isEbitRow(row.metric) ? 'var(--ddk-gold-subtle)' : rIdx % 2 === 1 ? 'var(--ddk-light-gray)' : 'white',
+                          fontWeight: isEbitRow(row.metric) || isGrossProfitRow(row.metric) ? 700 : 400
                         }}
                       >
-                        <td style={{ padding: '0.75rem 0.85rem' }}>{formatMetric(row.metric)}</td>
+                        <td style={{ padding: '0.75rem 0.85rem' }}>{row.metric}</td>
                         <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right' }}>{row.y2021}</td>
                         <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right' }}>{row.y2022}</td>
                         <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right' }}>{row.y2023}</td>
-                        <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right', color: row.metric.includes('Operating Income') ? 'var(--ddk-dark)' : 'inherit', fontWeight: 800 }}>
+                        <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right', color: isEbitRow(row.metric) ? 'var(--ddk-dark)' : 'inherit', fontWeight: 800 }}>
                           {row.y2024}
                         </td>
                       </tr>
@@ -178,7 +215,9 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>{m.label}</div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', margin: '0.35rem 0' }}>
                       <span style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>{m.y2024}</span>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>(was {m.y2022})</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        ({isEn ? 'was' : 'sebelumnya'} {m.y2022})
+                      </span>
                     </div>
                     <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--ddk-primary-blue)', fontFamily: 'var(--font-heading)' }}>{m.change}</div>
                   </div>
@@ -192,10 +231,18 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
                   <thead>
                     <tr style={{ background: 'var(--ddk-primary-blue)', color: 'white', fontFamily: 'var(--font-heading)' }}>
-                      <th style={{ padding: '0.8rem', textAlign: 'left', fontWeight: 700 }}>Operational KPI</th>
-                      <th style={{ padding: '0.8rem', textAlign: 'center', fontWeight: 700 }}>Before AI (Manual)</th>
-                      <th style={{ padding: '0.8rem', textAlign: 'center', fontWeight: 700, color: 'var(--ddk-gold)' }}>After AI Model</th>
-                      <th style={{ padding: '0.8rem', textAlign: 'left', fontWeight: 700 }}>Commercial & Financial Impact</th>
+                      <th style={{ padding: '0.8rem', textAlign: 'left', fontWeight: 700 }}>
+                        {isEn ? 'Operational KPI' : 'KPI Operasional'}
+                      </th>
+                      <th style={{ padding: '0.8rem', textAlign: 'center', fontWeight: 700 }}>
+                        {isEn ? 'Before AI (Manual)' : 'Sebelum AI (Manual)'}
+                      </th>
+                      <th style={{ padding: '0.8rem', textAlign: 'center', fontWeight: 700, color: 'var(--ddk-gold)' }}>
+                        {isEn ? 'After AI Model' : 'Sesudah Model AI'}
+                      </th>
+                      <th style={{ padding: '0.8rem', textAlign: 'left', fontWeight: 700 }}>
+                        {isEn ? 'Commercial & Financial Impact' : 'Dampak Komersial & Finansial'}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -204,7 +251,7 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                         <td style={{ padding: '0.75rem 0.8rem', fontWeight: 600 }}>{sc.metric}</td>
                         <td style={{ padding: '0.75rem 0.8rem', textAlign: 'center', color: '#BE123C', fontWeight: 700 }}>{sc.beforeAI}</td>
                         <td style={{ padding: '0.75rem 0.8rem', textAlign: 'center', color: 'var(--ddk-dark)', fontWeight: 800 }}>{sc.afterAI}</td>
-                        <td style={{ padding: '0.75rem 0.8rem', color: 'var(--text-secondary)' }}>{formatMetric(sc.impact)}</td>
+                        <td style={{ padding: '0.75rem 0.8rem', color: 'var(--text-secondary)' }}>{sc.impact}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -219,7 +266,7 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <MessageSquare size={20} color="var(--ddk-dark)" />
             <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
-              DDK Class Discussion & Faculty Prompts
+              {isEn ? 'DDK Class Discussion & Faculty Prompts' : 'Diskusi Kelas DDK & Pertanyaan Evaluasi'}
             </h3>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginBottom: '1.5rem' }}>

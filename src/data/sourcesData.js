@@ -1,3 +1,5 @@
+import { SOURCES_AND_READINGS_ID } from './sourcesData.id';
+
 export const SOURCES_AND_READINGS = [
   {
     id: "src-1",
@@ -88,17 +90,21 @@ export const SOURCES_AND_READINGS = [
   },
   {
     id: "src-7",
-    title: "Studi Kasus Bisnis Kopi AJIB & Data Analisis Lengkap (Dharma Korporasi Archive)",
+    title: "Kopi AJIB Business Case Study & Complete Analytical Data (Dharma Korporasi Archive)",
     authors: "Danny Kosasih (Founder & CEO Dharma Korporasi)",
     publisher: "Internal Academic Publication (Google Drive Reference)",
     type: "Empirical Case Study",
     focus: "Indonesian New Retail case study analyzing multi-year financial statements, AI supply chain waste reduction, customer lifetime value, and Porter's 5 forces.",
     keyChapters: [
-      "Section 2: Tantangan & Peluang Pasar Kopi Ritel Indonesia",
-      "Section 5: Analisis Rantai Pasok Hulu-Hilir Berbasis AI",
-      "Section 8: Analisis Keuangan: Dari Bakar Uang ke Profitabilitas",
-      "Section 11: Arsitektur Teknologi & Tata Kelola AI Etis"
+      "Section 2: Indonesian Retail Coffee Market Challenges & Opportunities",
+      "Section 5: End-to-End AI-Powered Supply Chain Analysis",
+      "Section 8: Financial Analysis: From Cash Burn to Profitability",
+      "Section 11: Technology Architecture & Ethical AI Governance"
     ],
     citation: "Kosasih, D. (2024). Studi Kasus: Kopi AJIB — Membangun Jaringan Kopi Nasional dengan Kecerdasan Buatan. Dharma Korporasi."
   }
 ];
+
+export function getSources(lang) {
+  return lang === 'en' ? SOURCES_AND_READINGS : SOURCES_AND_READINGS_ID;
+}

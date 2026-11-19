@@ -1,3 +1,5 @@
+import { QUIZZES_ID } from './quizzesData.id';
+
 export const QUIZZES = [
   {
     id: "quiz-0",
@@ -252,3 +254,7 @@ export const QUIZZES = [
     ]
   }
 ];
+
+export function getQuizzes(lang) {
+  return lang === 'en' ? QUIZZES : QUIZZES_ID;
+}

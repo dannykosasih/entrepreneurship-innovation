@@ -1,3 +1,6 @@
+import { COURSES_ID } from './coursesData.id';
+import { COURSE_SPEAKER_NOTES_EN } from './courseSpeakerNotesEn';
+
 export const COURSES = [
   {
     id: "mod-0",
@@ -692,7 +695,7 @@ By constructing detailed Synthetic Personas (e.g. simulating a 28-year-old busy 
 Rigorous sizing requires bottom-up methodology:
 • **TAM (Total Addressable Market):** Total annual revenue if you achieved 100% market share across every segment and geography (e.g., Total Indonesian retail ready-to-drink coffee: Rp 39 Trillion).
 • **SAM (Serviceable Available Market):** The subset of TAM that directly matches your product format, target demographic, and delivery channel (e.g., Urban coffee drinkers in Tier-1 & Tier-2 Indonesian cities ordering via grab-and-go / delivery: Rp 12 Trillion).
-• **SOM (Serviceable Obtainable Market):** The realistic portion of SAM your startup can capture in years 1–3 given your marketing budget, outlet count, and operational capacity (e.g., Capturing 3% of Jakarta's grab-and-go market across 50 outlets: Rp 180 Miliar).`
+• **SOM (Serviceable Obtainable Market):** The realistic portion of SAM your startup can capture in years 1–3 given your marketing budget, outlet count, and operational capacity (e.g., Capturing 3% of Jakarta's grab-and-go market across 50 outlets: IDR 180 Billion).`
       },
       {
         heading: "2. Porter's Five Forces Analysis",
@@ -989,7 +992,7 @@ Essential Formulas:
         title: "Kopi AJIB AI Supply Chain Benchmark",
         tag: "CASE NUMBERS",
         points: [
-          "Ingredient Waste & Spoilage: Dropped from 9.5% to 3.8% (Saved Rp 39 Miliar/year)",
+          "Ingredient Waste & Spoilage: Dropped from 9.5% to 3.8% (Saved IDR 39 Billion/year)",
           "Demand Forecasting Accuracy: Lifted from 61% to 88% using weather and traffic telemetry",
           "Stockout Incidents: Reduced from 7.2 to 2.1 per store per month",
           "Warehouse Delivery Lead Time: Compressed from 18 hours to 11 hours"
@@ -1076,7 +1079,7 @@ This operational efficiency enabled Kopi AJIB to expand to 812 outlets nationwid
       },
       {
         number: 3,
-        title: "Bagi & Kelola Portofolio Inovasi (Nagji & Tuff)",
+        title: "Managing the Innovation Portfolio (Nagji & Tuff)",
         tag: "INNOVATION PORTFOLIO",
         points: [
           "Core Innovation (70%): Optimizing existing products for existing customers",
@@ -1273,3 +1276,15 @@ This operational efficiency enabled Kopi AJIB to expand to 812 outlets nationwid
     ]
   }
 ];
+
+const COURSES_EN = COURSES.map((course) => ({
+  ...course,
+  slides: (course.slides || []).map((slide, idx) => ({
+    ...slide,
+    speakerNotes: COURSE_SPEAKER_NOTES_EN[course.id]?.[idx] || slide.speakerNotes,
+  })),
+}));
+
+export function getCourses(lang) {
+  return lang === 'en' ? COURSES_EN : COURSES_ID;
+}

@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
-import { SOURCES_AND_READINGS } from '../data/sourcesData';
-import { 
-  BookOpen, 
-  Copy, 
-  Check, 
-  ExternalLink, 
-  Bookmark, 
-  FolderDown, 
-  FileCheck 
-} from 'lucide-react';
+import { getSources } from '../data/sourcesData';
+import { useLanguage } from '../context/LanguageContext';
+import { Copy, Check } from 'lucide-react';
 
 export function SourcesReading() {
+  const { lang, isEn } = useLanguage();
+  const sources = getSources(lang);
   const [copiedId, setCopiedId] = useState(null);
 
   const handleCopyCitation = (id, citation) => {
@@ -24,30 +19,32 @@ export function SourcesReading() {
       {/* Header */}
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <span className="badge badge-primary" style={{ marginBottom: '0.4rem' }}>
-          Academic Bibliography & Syllabus
+          {isEn ? 'Academic Bibliography & Syllabus' : 'Daftar Pustaka Akademik & Silabus'}
         </span>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-          Curated Literature & Faculty References
+          {isEn ? 'Curated Literature & Faculty References' : 'Literatur Pilihan & Referensi Pengajar'}
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.2rem' }}>
-          Official textbooks, seminal academic papers, and faculty lecture archives referenced throughout the curriculum.
+          {isEn
+            ? 'Official textbooks, seminal academic papers, and faculty lecture archives referenced throughout the curriculum.'
+            : 'Buku teks resmi, makalah akademik rujukan, dan arsip kuliah pengajar yang digunakan di seluruh kurikulum.'}
         </p>
       </div>
 
       {/* Sources Grid */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {SOURCES_AND_READINGS.map(src => {
+        {sources.map(src => {
           const isCopied = copiedId === src.id;
           return (
             <div key={src.id} className="card" style={{ background: 'var(--bg-surface)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
                     <span className="badge badge-primary" style={{ fontSize: '0.65rem' }}>
                       {src.type}
                     </span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      Publisher: {src.publisher}
+                      {isEn ? 'Publisher:' : 'Penerbit:'} {src.publisher}
                     </span>
                   </div>
 
@@ -55,7 +52,7 @@ export function SourcesReading() {
                     {src.title}
                   </h3>
                   <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--accent-primary)', marginBottom: '0.75rem' }}>
-                    Author(s): {src.authors}
+                    {isEn ? 'Author(s):' : 'Penulis:'} {src.authors}
                   </div>
 
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1rem' }}>
@@ -71,7 +68,7 @@ export function SourcesReading() {
                     marginBottom: '1rem'
                   }}>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-                      Key Syllabi Chapters & Modules:
+                      {isEn ? 'Key Syllabi Chapters & Modules:' : 'Bab & Modul Silabus Kunci:'}
                     </div>
                     <ul style={{ paddingLeft: '1.2rem', fontSize: '0.825rem', color: 'var(--text-primary)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                       {src.keyChapters.map((ch, i) => (
@@ -100,7 +97,9 @@ export function SourcesReading() {
                   style={{ fontSize: '0.8rem', flexShrink: 0 }}
                 >
                   {isCopied ? <Check size={14} color="var(--accent-emerald)" /> : <Copy size={14} />}
-                  {isCopied ? 'Citation Copied' : 'Copy APA Citation'}
+                  {isCopied
+                    ? (isEn ? 'Citation Copied' : 'Sitasi Disalin')
+                    : (isEn ? 'Copy APA Citation' : 'Salin Sitasi APA')}
                 </button>
               </div>
             </div>

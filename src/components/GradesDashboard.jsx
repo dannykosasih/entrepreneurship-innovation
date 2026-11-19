@@ -46,22 +46,22 @@ export function GradesDashboard({
   if (totalScore >= 85) {
     letterGrade = 'A';
     gpaPoint = 4.0;
-    statusText = 'Distinction / Honors (DDK Scholar)';
+    statusText = isEn ? 'Distinction / Honors (DDK Scholar)' : 'Dengan Pujian (DDK Scholar)';
     statusColor = 'var(--ddk-primary-blue)';
   } else if (totalScore >= 80) {
     letterGrade = 'A-';
     gpaPoint = 3.7;
-    statusText = 'Excellent Standing';
+    statusText = isEn ? 'Excellent Standing' : 'Sangat Memuaskan';
     statusColor = 'var(--ddk-primary-blue)';
   } else if (totalScore >= 75) {
     letterGrade = 'B+';
     gpaPoint = 3.3;
-    statusText = 'Very Good Standing';
+    statusText = isEn ? 'Very Good Standing' : 'Memuaskan';
     statusColor = 'var(--ddk-dark)';
   } else if (totalScore >= 70) {
     letterGrade = 'B';
     gpaPoint = 3.0;
-    statusText = 'Satisfactory Passing';
+    statusText = isEn ? 'Satisfactory Passing' : 'Lulus Baik';
     statusColor = 'var(--ddk-dark)';
   } else if (totalScore >= 60) {
     letterGrade = 'C+';
@@ -69,7 +69,7 @@ export function GradesDashboard({
     statusText = isEn ? 'In Progress' : 'Dalam Progres';
     statusColor = '#D97706';
   } else {
-    letterGrade = 'Incomplete';
+    letterGrade = isEn ? 'Incomplete' : 'Belum Lengkap';
     gpaPoint = 1.0;
     statusText = isEn ? 'Not Yet Eligible for Graduation' : 'Belum Memenuhi Syarat Kelulusan';
     statusColor = 'var(--text-muted)';
@@ -77,27 +77,27 @@ export function GradesDashboard({
 
   const badges = [
     {
-      title: 'Mindset Pioneer',
+      title: isEn ? 'Mindset Pioneer' : 'Pelopor Mindset',
       desc: isEn ? 'Completed Modules 0 & 1 Kuratko Mindset' : 'Tuntas Modul 0 & 1 Mindset Kuratko',
       earned: completedModules.includes('mod-0') || completedModules.includes('mod-1'),
     },
     {
-      title: 'Customer Discovery Hero',
+      title: isEn ? 'Customer Discovery Hero' : 'Pahlawan Customer Discovery',
       desc: isEn ? 'Score >= 70% on Steve Blank Assessment' : 'Skor >= 70% Asesmen Steve Blank',
       earned: (quizScores['quiz-4'] || 0) >= 70,
     },
     {
-      title: 'New Retail Strategist',
+      title: isEn ? 'New Retail Strategist' : 'Ahli Strategi Ritel Baru',
       desc: isEn ? 'Completed Kopi AJIB Case Study' : 'Tuntas Studi Kasus Kopi AJIB',
       earned: completedCases.includes('case-kopi-ajib'),
     },
     {
-      title: 'Unit Economics Master',
+      title: isEn ? 'Unit Economics Master' : 'Master Unit Economics',
       desc: isEn ? 'Score >= 70% on Finance & CAC/CLV' : 'Skor >= 70% Finansial & CAC/CLV',
       earned: (quizScores['quiz-10'] || 0) >= 70,
     },
     {
-      title: 'Simulated Founder',
+      title: isEn ? 'Simulated Founder' : 'Founder Simulasi',
       desc: isEn ? 'Completed 4-Quarter DDK Business Simulation' : 'Tuntas 4 Kuartal Simulasi Bisnis DDK',
       earned: simulatorScore !== undefined,
     },
@@ -110,7 +110,7 @@ export function GradesDashboard({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <span className="badge badge-gold" style={{ marginBottom: '0.4rem' }}>
-              DDK Academic Performance
+              {isEn ? 'DDK Academic Performance' : 'Performa Akademik DDK'}
             </span>
             <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--ddk-dark)' }}>
               {isEn ? 'DDK Gradebook & Certification' : 'Buku Nilai & Sertifikasi DDK'}

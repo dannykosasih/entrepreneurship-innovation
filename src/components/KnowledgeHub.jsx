@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { KNOWLEDGE_BASE } from '../data/knowledgeBaseData';
+import { getKnowledgeBase } from '../data/knowledgeBaseData';
 import { useLanguage } from '../context/LanguageContext';
-import { 
-  Search, 
-  BookOpen, 
-  Lightbulb, 
-  Filter, 
-  Calculator, 
-  Sparkles 
-} from 'lucide-react';
+import { Search } from 'lucide-react';
+
+const CATEGORY_LABELS_ID = {
+  All: 'Semua',
+  Foundations: 'Fondasi',
+  Mindset: 'Mindset',
+  Methodologies: 'Metodologi',
+  'Finance & Metrics': 'Keuangan & Metrik',
+  Strategy: 'Strategi',
+};
 
 export function KnowledgeHub() {
-  const { isEn } = useLanguage();
+  const { lang, isEn } = useLanguage();
+  const knowledgeItems = getKnowledgeBase(lang);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   const categories = ['All', 'Foundations', 'Mindset', 'Methodologies', 'Finance & Metrics', 'Strategy'];
+  const getCategoryLabel = (cat) => (isEn ? cat : (CATEGORY_LABELS_ID[cat] || cat));
 
-  const filteredItems = KNOWLEDGE_BASE.filter(item => {
+  const filteredItems = knowledgeItems.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesSearch = item.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           item.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -33,15 +37,15 @@ export function KnowledgeHub() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <span className="badge badge-gold" style={{ marginBottom: '0.4rem' }}>
-              DDK Knowledge Base
+              {isEn ? 'DDK Knowledge Base' : 'Basis Pengetahuan DDK'}
             </span>
             <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--ddk-dark)' }}>
-              Core Frameworks & Concepts Wiki
+              {isEn ? 'Core Frameworks & Concepts Wiki' : 'Wiki Kerangka & Konsep Inti'}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginTop: '0.2rem' }}>
               {isEn
                 ? 'A curated collection of fundamental theories, economic models, unit economics formulas, and competitive advantage frameworks.'
-                : 'Kumpulan teori fundamental, model ekonomi, rumus unit economics, dan keunggulan kompetitif.'}
+                : 'Kumpulan teori fundamental, model ekonomi, rumus unit economics, dan kerangka keunggulan kompetitif.'}
             </p>
           </div>
 
@@ -96,84 +100,90 @@ export function KnowledgeHub() {
                 fontFamily: 'var(--font-heading)'
               }}
             >
-              {cat}
+              {getCategoryLabel(cat)}
             </button>
           ))}
         </div>
       </div>
 
       {/* Grid of Knowledge Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.25rem' }}>
-        {filteredItems.map(item => (
-          <div 
-            key={item.id} 
-            className="card" 
-            style={{ 
-              background: 'var(--ddk-white)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '1rem',
-              borderLeft: '4px solid var(--ddk-primary-blue)'
-            }}
-          >
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span className="badge badge-gold" style={{ fontSize: '0.625rem' }}>
-                  {item.category}
-                </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--ddk-primary-blue)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-                  {item.author}
-                </span>
-              </div>
-
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.5rem', lineHeight: 1.3 }}>
-                {item.term}
-              </h3>
-
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.6, marginBottom: '0.85rem' }}>
-                {item.definition}
-              </p>
-
-              {item.formulaOrStructure && (
-                <div style={{
-                  background: 'var(--ddk-light-gray)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '0.65rem 0.85rem',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.75rem',
-                  color: 'var(--ddk-dark)',
-                  fontWeight: 600,
-                  marginBottom: '0.85rem'
-                }}>
-                  {item.formulaOrStructure}
+      {filteredItems.length === 0 ? (
+        <div className="card" style={{ background: 'var(--ddk-white)', textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+          {isEn ? 'No frameworks or concepts match your search.' : 'Tidak ada kerangka atau konsep yang cocok dengan pencarian Anda.'}
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.25rem' }}>
+          {filteredItems.map(item => (
+            <div 
+              key={item.id} 
+              className="card" 
+              style={{ 
+                background: 'var(--ddk-white)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '1rem',
+                borderLeft: '4px solid var(--ddk-primary-blue)'
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span className="badge badge-gold" style={{ fontSize: '0.625rem' }}>
+                    {getCategoryLabel(item.category)}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--ddk-primary-blue)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                    {item.author}
+                  </span>
                 </div>
-              )}
-            </div>
 
-            <div>
-              <div style={{
-                background: 'var(--ddk-blue-subtle)',
-                border: '1px solid rgba(15, 95, 168, 0.2)',
-                padding: '0.65rem 0.85rem',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.8rem',
-                color: 'var(--ddk-dark)',
-                marginBottom: '0.5rem'
-              }}>
-                <strong style={{ fontFamily: 'var(--font-heading)' }}>
-                  {isEn ? 'Real-World Indonesian Example:' : 'Contoh Riil Indonesia:'}
-                </strong> {item.example}
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.5rem', lineHeight: 1.3 }}>
+                  {item.term}
+                </h3>
+
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.6, marginBottom: '0.85rem' }}>
+                  {item.definition}
+                </p>
+
+                {item.formulaOrStructure && (
+                  <div style={{
+                    background: 'var(--ddk-light-gray)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '0.65rem 0.85rem',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.75rem',
+                    color: 'var(--ddk-dark)',
+                    fontWeight: 600,
+                    marginBottom: '0.85rem'
+                  }}>
+                    {item.formulaOrStructure}
+                  </div>
+                )}
               </div>
 
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                <strong>{isEn ? 'Strategic Impact:' : 'Dampak Strategis:'}</strong> {item.importance}
+              <div>
+                <div style={{
+                  background: 'var(--ddk-blue-subtle)',
+                  border: '1px solid rgba(15, 95, 168, 0.2)',
+                  padding: '0.65rem 0.85rem',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.8rem',
+                  color: 'var(--ddk-dark)',
+                  marginBottom: '0.5rem'
+                }}>
+                  <strong style={{ fontFamily: 'var(--font-heading)' }}>
+                    {isEn ? 'Real-World Indonesian Example:' : 'Contoh Riil Indonesia:'}
+                  </strong> {item.example}
+                </div>
+
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <strong>{isEn ? 'Strategic Impact:' : 'Dampak Strategis:'}</strong> {item.importance}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

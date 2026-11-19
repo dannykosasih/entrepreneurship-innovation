@@ -13,14 +13,14 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
   };
 
   const certificateId = `DDK-EI-${Math.floor(100000 + Math.random() * 900000)}`;
-  const currentDate = new Date().toLocaleDateString('en-US', {
+  const currentDate = new Date().toLocaleDateString(isEn ? 'en-US' : 'id-ID', {
     month: 'long',
     day: 'numeric',
     year: 'numeric'
   });
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="DDK Credential preview" style={{
+    <div role="dialog" aria-modal="true" aria-label={isEn ? 'DDK Credential preview' : 'Pratinjau Sertifikat DDK'} style={{
       position: 'fixed',
       top: 0,
       left: 0,
@@ -86,7 +86,7 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
             <button onClick={handlePrint} className="btn btn-gold" style={{ fontSize: '0.8rem', padding: '0.45rem 0.95rem' }}>
               <Printer size={14} /> {isEn ? 'Print / Download PDF' : 'Cetak / Unduh PDF'}
             </button>
-            <button aria-label="Close certificate" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+            <button aria-label={isEn ? 'Close certificate' : 'Tutup sertifikat'} onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
               <X size={22} />
             </button>
           </div>
@@ -129,7 +129,7 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
           </div>
 
           <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600, letterSpacing: '0.08em', marginBottom: '1.25rem', textTransform: 'uppercase' }}>
-            Executive Training & Entrepreneurship Education
+            {isEn ? 'Executive Training & Entrepreneurship Education' : 'Pelatihan Eksekutif & Pendidikan Kewirausahaan'}
           </div>
 
           <h2 style={{
@@ -140,7 +140,7 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
             letterSpacing: '0.02em',
             marginBottom: '1rem'
           }}>
-            CERTIFICATE OF COMPLETION
+            {isEn ? 'CERTIFICATE OF COMPLETION' : 'SERTIFIKAT KELULUSAN'}
           </h2>
 
           <p style={{ fontStyle: 'italic', color: '#475569', fontSize: '1rem', marginBottom: '1.25rem' }}>
@@ -174,7 +174,7 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
             marginBottom: '1.5rem',
             fontFamily: 'var(--font-heading)'
           }}>
-            Entrepreneurship & Innovation Mastery
+            {isEn ? 'Entrepreneurship & Innovation Mastery' : 'Penguasaan Kewirausahaan & Inovasi'}
           </div>
 
           <div style={{
@@ -188,7 +188,12 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
             fontSize: '0.85rem',
             marginBottom: '2.5rem'
           }}>
-            <span>{isEn ? 'Final Grade:' : 'Nilai Akhir:'} <strong style={{ color: '#0C4F8E' }}>{overallScore}% ({overallScore >= 85 ? 'Grade A' : 'Grade B+'})</strong></span>
+            <span>
+              {isEn ? 'Final Grade:' : 'Nilai Akhir:'}{' '}
+              <strong style={{ color: '#0C4F8E' }}>
+                {overallScore}% ({overallScore >= 85 ? (isEn ? 'Grade A' : 'Nilai A') : (isEn ? 'Grade B+' : 'Nilai B+')})
+              </strong>
+            </span>
             <span>•</span>
             <span>{isEn ? 'Issued:' : 'Diterbitkan:'} <strong>{currentDate}</strong></span>
             <span>•</span>
@@ -208,8 +213,12 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
                 Danny Kosasih
               </div>
               <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#0C4F8E', fontFamily: 'var(--font-heading)' }}>Danny Kosasih</div>
-              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Founder & CEO Dharma Korporasi</div>
-              <div style={{ fontSize: '0.75rem', color: '#0F5FA8', fontWeight: 600 }}>LinkedIn Top Voice | AI & Innovation Trainer</div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>
+                {isEn ? 'Founder & CEO Dharma Korporasi' : 'Pendiri & CEO Dharma Korporasi'}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#0F5FA8', fontWeight: 600 }}>
+                {isEn ? 'LinkedIn Top Voice | AI & Innovation Trainer' : 'LinkedIn Top Voice | Pelatih AI & Inovasi'}
+              </div>
             </div>
           </div>
         </div>

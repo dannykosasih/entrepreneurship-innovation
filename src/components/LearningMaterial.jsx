@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { COURSES } from '../data/coursesData';
-import { COURSE_SPEAKER_NOTES_EN } from '../data/courseSpeakerNotesEn';
+import { getCourses } from '../data/coursesData';
 import { useLanguage } from '../context/LanguageContext';
 import { 
   CheckCircle2, 
@@ -15,10 +14,6 @@ import {
   ExternalLink, 
   ChevronLeft, 
   ChevronRight, 
-  Maximize2, 
-  Minimize2, 
-  FileText, 
-  Play, 
   Presentation, 
   Terminal 
 } from 'lucide-react';
@@ -31,15 +26,16 @@ export function LearningMaterial({
   selectedCourseId: propCourseId,
   onSelectCourse: propSetCourseId
 }) {
-  const { isEn } = useLanguage();
-  const [internalCourseId, setInternalCourseId] = useState(COURSES[0].id);
+  const { lang, isEn } = useLanguage();
+  const courses = getCourses(lang);
+  const [internalCourseId, setInternalCourseId] = useState(courses[0].id);
   const selectedCourseId = propCourseId !== undefined ? propCourseId : internalCourseId;
   const setSelectedCourseId = propSetCourseId || setInternalCourseId;
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [slideViewMode, setSlideViewMode] = useState('interactive'); // 'interactive' | 'gdrive'
   const [copiedPrompt, setCopiedPrompt] = useState(false);
 
-  const currentCourse = COURSES.find(c => c.id === selectedCourseId) || COURSES[0];
+  const currentCourse = courses.find(c => c.id === selectedCourseId) || courses[0];
   const isCompleted = completedModules.includes(currentCourse.id);
   const slides = currentCourse.slides || [];
 
@@ -291,20 +287,16 @@ export function LearningMaterial({
   };
 
   const dannyStory = getDannySignatureStory(currentCourse.number);
-  const rawSlide = slides[currentSlideIndex] || slides[0] || {
+  const activeSlide = slides[currentSlideIndex] || slides[0] || {
     number: 1,
     title: currentCourse.title,
-    tag: "PRESENTATION SLIDE",
-    points: currentCourse.objectives || ["Comprehensive slide deck for this chapter."],
+    tag: isEn ? "PRESENTATION SLIDE" : "SLIDE PRESENTASI",
+    points: currentCourse.objectives || [isEn ? "Comprehensive slide deck for this chapter." : "Deck slide komprehensif untuk bab ini."],
     speakerNotes: isEn
       ? "Use this presentation deck as your core guide for the chapter lecture."
       : "Silakan gunakan deck presentasi ini sebagai panduan inti materi perkuliahan.",
-    highlight: currentCourse.keyTakeaways?.[0] || "Dharma Korporasi Academic Standard"
+    highlight: currentCourse.keyTakeaways?.[0] || (isEn ? "Dharma Korporasi Academic Standard" : "Standar Akademik Dharma Korporasi")
   };
-  const activeSpeakerNotes = isEn
-    ? (COURSE_SPEAKER_NOTES_EN[currentCourse.id]?.[currentSlideIndex] || rawSlide.speakerNotes)
-    : rawSlide.speakerNotes;
-  const activeSlide = { ...rawSlide, speakerNotes: activeSpeakerNotes };
 
   const ddkPrompt = isEn
     ? `Act as a senior business & innovation mentor (Danny Kosasih Style). I am currently studying "${currentCourse.title}". Give me 3 sharp diagnostic questions and 1 practical validation framework to stress-test my venture's business model.`
@@ -338,10 +330,10 @@ export function LearningMaterial({
           marginBottom: '0.25rem',
           fontFamily: 'var(--font-heading)'
         }}>
-          DDK Course Modules ({COURSES.length})
+          {isEn ? `DDK Course Modules (${courses.length})` : `Modul Kursus DDK (${courses.length})`}
         </div>
 
-        {COURSES.map((course) => {
+        {courses.map((course) => {
           const active = course.id === selectedCourseId;
           const done = completedModules.includes(course.id);
           return (
@@ -370,7 +362,7 @@ export function LearningMaterial({
                     color: active ? 'var(--ddk-primary-blue)' : 'var(--text-muted)',
                     fontFamily: 'var(--font-mono)'
                   }}>
-                    CH {course.number}
+                    {isEn ? `CH ${course.number}` : `BAB ${course.number}`}
                   </span>
                   <span className="badge badge-gold" style={{ fontSize: '0.625rem', padding: '0.1rem 0.4rem' }}>
                     {course.level}
@@ -419,7 +411,7 @@ export function LearningMaterial({
                   padding: '0.2rem 0.6rem',
                   borderRadius: '4px'
                 }}>
-                  CHAPTER {currentCourse.number}
+                  {isEn ? `CHAPTER ${currentCourse.number}` : `BAB ${currentCourse.number}`}
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                   <Clock size={14} color="var(--ddk-primary-blue)" /> {currentCourse.duration}
@@ -444,14 +436,16 @@ export function LearningMaterial({
                 style={{ fontSize: '0.85rem' }}
               >
                 <CheckCircle2 size={16} />
-                {isCompleted ? 'Completed ✓' : 'Mark Completed'}
+                {isCompleted
+                  ? (isEn ? 'Completed ✓' : 'Selesai ✓')
+                  : (isEn ? 'Mark Completed' : 'Tandai Selesai')}
               </button>
               <button
                 onClick={() => onJumpToQuiz(currentCourse.id)}
                 className="btn btn-gold"
                 style={{ fontSize: '0.85rem' }}
               >
-                <HelpCircle size={16} /> Chapter Quiz
+                <HelpCircle size={16} /> {isEn ? 'Chapter Quiz' : 'Kuis Bab'}
               </button>
             </div>
           </div>
@@ -471,7 +465,10 @@ export function LearningMaterial({
           }}>
             <Lightbulb size={20} color="var(--ddk-gold)" style={{ flexShrink: 0 }} />
             <div>
-              <strong style={{ fontFamily: 'var(--font-heading)' }}>DDK Perspective Guide:</strong> {getDDKPersonaAdvice()}
+              <strong style={{ fontFamily: 'var(--font-heading)' }}>
+                {isEn ? 'DDK Perspective Guide:' : 'Panduan Perspektif DDK:'}
+              </strong>{' '}
+              {getDDKPersonaAdvice()}
             </div>
           </div>
         </div>
@@ -508,10 +505,10 @@ export function LearningMaterial({
                 alignItems: 'center',
                 gap: '0.3rem'
               }}>
-                <Presentation size={14} /> SLIDE DECK
+                <Presentation size={14} /> {isEn ? 'SLIDE DECK' : 'DECK SLIDE'}
               </div>
               <span style={{ fontWeight: 700, fontSize: '0.9rem', fontFamily: 'var(--font-heading)' }}>
-                {currentCourse.deckTitle || `Chapter ${currentCourse.number} Presentation`}
+                {currentCourse.deckTitle || (isEn ? `Chapter ${currentCourse.number} Presentation` : `Presentasi Bab ${currentCourse.number}`)}
               </span>
             </div>
 
@@ -532,7 +529,7 @@ export function LearningMaterial({
                     color: slideViewMode === 'interactive' ? '#061E38' : 'white'
                   }}
                 >
-                  Interactive Player
+                  {isEn ? 'Interactive Player' : 'Pemutar Interaktif'}
                 </button>
                 <button
                   onClick={() => setSlideViewMode('gdrive')}
@@ -548,7 +545,7 @@ export function LearningMaterial({
                     color: slideViewMode === 'gdrive' ? '#061E38' : 'white'
                   }}
                 >
-                  Google Drive Embed
+                  {isEn ? 'Google Drive Embed' : 'Sematkan Google Drive'}
                 </button>
               </div>
 
@@ -572,7 +569,7 @@ export function LearningMaterial({
                     fontWeight: 600
                   }}
                 >
-                  <ExternalLink size={12} /> Drive Deck
+                  <ExternalLink size={12} /> {isEn ? 'Drive Deck' : 'Deck Drive'}
                 </a>
               )}
             </div>
@@ -613,7 +610,9 @@ export function LearningMaterial({
                       borderRadius: '999px',
                       color: 'white'
                     }}>
-                      Slide {currentSlideIndex + 1} of {slides.length}
+                      {isEn
+                        ? `Slide ${currentSlideIndex + 1} of ${slides.length}`
+                        : `Slide ${currentSlideIndex + 1} dari ${slides.length}`}
                     </span>
                   </div>
 
@@ -671,7 +670,7 @@ export function LearningMaterial({
               }}>
                 <div style={{ flex: 1, minWidth: '260px' }}>
                   <div style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--ddk-primary-blue)', fontFamily: 'var(--font-heading)', textTransform: 'uppercase' }}>
-                    Danny Kosasih's Speaker Notes:
+                    {isEn ? "Danny Kosasih's Speaker Notes:" : 'Catatan Pembicara Danny Kosasih:'}
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-body)', fontStyle: 'italic', marginTop: '0.15rem' }}>
                     "{activeSlide.speakerNotes}"
@@ -691,7 +690,7 @@ export function LearningMaterial({
                       cursor: currentSlideIndex === 0 ? 'not-allowed' : 'pointer'
                     }}
                   >
-                    <ChevronLeft size={16} /> Prev Slide
+                    <ChevronLeft size={16} /> {isEn ? 'Prev Slide' : 'Slide Sebelumnya'}
                   </button>
 
                   <div style={{ display: 'flex', gap: '0.3rem', padding: '0 0.5rem' }}>
@@ -723,7 +722,7 @@ export function LearningMaterial({
                       cursor: currentSlideIndex === slides.length - 1 ? 'not-allowed' : 'pointer'
                     }}
                   >
-                    Next Slide <ChevronRight size={16} />
+                    {isEn ? 'Next Slide' : 'Slide Berikutnya'} <ChevronRight size={16} />
                   </button>
                 </div>
               </div>
@@ -746,7 +745,8 @@ export function LearningMaterial({
         {/* Danny Kosasih Signature Storytelling Box */}
         <div className="ddk-quote-box">
           <div className="ddk-quote-title">
-            <Sparkles size={18} color="var(--ddk-gold)" /> Danny Kosasih's Signature Story & Hook:
+            <Sparkles size={18} color="var(--ddk-gold)" />{' '}
+            {isEn ? "Danny Kosasih's Signature Story & Hook:" : 'Kisah & Analogi Khas Danny Kosasih:'}
           </div>
           <div style={{ fontWeight: 700, color: 'var(--ddk-dark)', marginBottom: '0.35rem', fontSize: '0.95rem' }}>
             "{dannyStory.analogy}"
@@ -772,7 +772,7 @@ export function LearningMaterial({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <Target size={18} color="var(--ddk-primary-blue)" />
             <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--ddk-dark)' }}>
-              Core Learning Objectives
+              {isEn ? 'Core Learning Objectives' : 'Tujuan Pembelajaran Inti'}
             </h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }}>
@@ -828,7 +828,9 @@ export function LearningMaterial({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Terminal size={18} color="var(--ddk-gold)" />
               <span style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '0.95rem', color: 'var(--ddk-gold)' }}>
-                DeKa AI Prompt Coach: Chapter Diagnostic Prompt
+                {isEn
+                  ? 'DeKa AI Prompt Coach: Chapter Diagnostic Prompt'
+                  : 'DeKa AI Prompt Coach: Prompt Diagnostik Bab'}
               </span>
             </div>
             <button
@@ -849,7 +851,9 @@ export function LearningMaterial({
               }}
             >
               {copiedPrompt ? <Check size={13} /> : <Copy size={13} />}
-              {copiedPrompt ? 'Prompt Copied!' : 'Copy Prompt'}
+              {copiedPrompt
+                ? (isEn ? 'Prompt Copied!' : 'Prompt Disalin!')
+                : (isEn ? 'Copy Prompt' : 'Salin Prompt')}
             </button>
           </div>
           <p style={{ fontSize: '0.8rem', color: '#B8C7D9', marginBottom: '0.5rem' }}>
@@ -877,7 +881,7 @@ export function LearningMaterial({
           borderLeft: '5px solid var(--ddk-gold)' 
         }}>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '0.75rem', color: 'var(--ddk-dark)' }}>
-            DDK Strategic Takeaways & Synthesis
+            {isEn ? 'DDK Strategic Takeaways & Synthesis' : 'Intisari & Sintesis Strategis DDK'}
           </h3>
           <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', color: 'var(--text-body)', fontSize: '0.925rem' }}>
             {currentCourse.keyTakeaways.map((item, i) => (

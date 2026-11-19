@@ -161,7 +161,7 @@ export function StartupSimulator({ onSaveSimulatorScore, previousScore }) {
     const clvCacRatio = (clv / cac).toFixed(1);
     const monthlyNetCashFlow = revenue - opex;
     const runwayMonths = monthlyNetCashFlow >= 0
-      ? 'Indefinite (Profitable)'
+      ? (isEn ? 'Indefinite (Profitable)' : 'Tak Terbatas (Menguntungkan)')
       : `${Math.max(0, Math.floor(cash / Math.abs(monthlyNetCashFlow)))} ${isEn ? 'Months' : 'Bulan'}`;
 
     return {
@@ -195,10 +195,12 @@ export function StartupSimulator({ onSaveSimulatorScore, previousScore }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <span className="badge badge-gold" style={{ marginBottom: '0.4rem' }}>
-              DDK Venture Engine
+              {isEn ? 'DDK Venture Engine' : 'Mesin Ventura DDK'}
             </span>
             <h1 style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
-              Venture Strategy Simulator: The New Retail Journey
+              {isEn
+                ? 'Venture Strategy Simulator: The New Retail Journey'
+                : 'Simulator Strategi Ventura: Perjalanan Ritel Baru'}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.2rem' }}>
               {isEn
@@ -249,7 +251,9 @@ export function StartupSimulator({ onSaveSimulatorScore, previousScore }) {
             <div className="card" style={{ borderLeft: '4px solid var(--ddk-dark)', background: 'var(--ddk-white)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 <span className="badge badge-blue">{isEn ? 'Quarter 1' : 'Kuartal 1'}</span>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Discovery & Problem-Solution Fit</h3>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
+                  {isEn ? 'Discovery & Problem-Solution Fit' : 'Discovery & Kesesuaian Masalah-Solusi'}
+                </h3>
               </div>
               
               <div style={{ marginBottom: '1rem' }}>
@@ -287,7 +291,7 @@ export function StartupSimulator({ onSaveSimulatorScore, previousScore }) {
 
               <div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--ddk-dark)', marginBottom: '0.4rem', fontFamily: 'var(--font-heading)' }}>
-                  {isEn ? '2. Pricing Strategy per Cup' : '2. Pricing Strategy per Cangkir'}
+                  {isEn ? '2. Pricing Strategy per Cup' : '2. Strategi Harga per Cangkir'}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem' }}>
                   {(isEn ? [
@@ -531,7 +535,7 @@ export function StartupSimulator({ onSaveSimulatorScore, previousScore }) {
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.825rem', color: '#B8C7D9' }}>Cash Runway</span>
+                  <span style={{ fontSize: '0.825rem', color: '#B8C7D9' }}>{isEn ? 'Cash Runway' : 'Ketahanan Kas (Runway)'}</span>
                   <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#6FA3D9' }}>{outcome.runwayMonths}</span>
                 </div>
               </div>
@@ -557,7 +561,7 @@ export function StartupSimulator({ onSaveSimulatorScore, previousScore }) {
               <Award size={36} />
             </div>
 
-            <span className="badge badge-gold">DDK Evaluation Complete</span>
+            <span className="badge badge-gold">{isEn ? 'DDK Evaluation Complete' : 'Evaluasi DDK Selesai'}</span>
             <h2 style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--ddk-dark)', marginTop: '0.5rem' }}>
               {ventureName}
             </h2>

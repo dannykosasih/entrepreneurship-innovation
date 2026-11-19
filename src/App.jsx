@@ -12,9 +12,18 @@ import { KnowledgeHub } from './components/KnowledgeHub';
 import { SourcesReading } from './components/SourcesReading';
 import { GradesDashboard } from './components/GradesDashboard';
 import { CertificateModal } from './components/CertificateModal';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { COURSES } from './data/coursesData';
 import './neon.css';
+
+function SkipLink() {
+  const { isEn } = useLanguage();
+  return (
+    <a className="skip-link" href="#learning-content">
+      {isEn ? 'Skip to learning content' : 'Lewati ke konten belajar'}
+    </a>
+  );
+}
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -130,7 +139,7 @@ export default function App() {
   return (
     <LanguageProvider>
     <div className="neon-app" data-design="neon-nights" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
-      <a className="skip-link" href="#learning-content">Skip to learning content</a>
+      <SkipLink />
       <Navbar
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen(open => !open)}

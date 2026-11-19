@@ -1,3 +1,5 @@
+import { KNOWLEDGE_BASE_ID } from './knowledgeBaseData.id';
+
 export const KNOWLEDGE_BASE = [
   {
     id: "kb-1",
@@ -120,3 +122,7 @@ export const KNOWLEDGE_BASE = [
     example: "Evaluating why high threat of substitutes and intense price wars make commodity coffee retail difficult without digital moats."
   }
 ];
+
+export function getKnowledgeBase(lang) {
+  return lang === 'en' ? KNOWLEDGE_BASE : KNOWLEDGE_BASE_ID;
+}

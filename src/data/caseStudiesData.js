@@ -1,3 +1,5 @@
+import { CASE_STUDIES_ID } from './caseStudiesData.id';
+
 export const CASE_STUDIES = [
   {
     id: "case-kopi-ajib",
@@ -26,9 +28,9 @@ export const CASE_STUDIES = [
         title: "2. The Multi-Year Financial Turnaround (2021 – 2024)",
         body: `During 2021–2022, Kopi AJIB executed an aggressive land-grab strategy, funding outlet rollouts and app development via Series A and Series B venture capital. By 2023, the company pivoted from raw expansion to operational unit economics profitability.`,
         financialTable: [
-          { metric: "Annual Revenue (Rp Miliar)", y2021: "342", y2022: "741", y2023: "1,180", y2024: "1,520" },
+          { metric: "Annual Revenue (IDR Billion)", y2021: "342", y2022: "741", y2023: "1,180", y2024: "1,520" },
           { metric: "Cost of Goods Sold (COGS)", y2021: "174", y2022: "363", y2023: "555", y2024: "700" },
-          { metric: "Gross Profit (Rp Miliar)", y2021: "168", y2022: "378", y2023: "625", y2024: "820" },
+          { metric: "Gross Profit (IDR Billion)", y2021: "168", y2022: "378", y2023: "625", y2024: "820" },
           { metric: "Gross Profit Margin (%)", y2021: "49.1%", y2022: "51.0%", y2023: "53.0%", y2024: "53.9%" },
           { metric: "Operating Expenses (OPEX)", y2021: "245", y2022: "436", y2023: "612", y2024: "742" },
           { metric: "Operating Income / EBIT", y2021: "-77 (Loss)", y2022: "-58 (Loss)", y2023: "+13 (Turnaround)", y2024: "+78 (Profitable)" }
@@ -53,7 +55,7 @@ export const CASE_STUDIES = [
 • **Geospatial Outlet Placement:** Evaluates foot traffic density and mobile telemetry to avoid sales cannibalization between adjacent stores.
 • **Dynamic Barista Scheduling:** Frontline staff shifts align precisely with the 07:00–09:30 and 15:00–17:00 demand spikes.`,
         supplyChainMetrics: [
-          { metric: "Ingredient Spoilage & Waste", beforeAI: "9.5%", afterAI: "3.8%", impact: "Saved ~Rp 39 Miliar annually" },
+          { metric: "Ingredient Spoilage & Waste", beforeAI: "9.5%", afterAI: "3.8%", impact: "Saved ~IDR 39 Billion annually" },
           { metric: "Monthly Stockouts per Store", beforeAI: "7.2 incidents", afterAI: "2.1 incidents", impact: "Fewer lost sales" },
           { metric: "Forecast Accuracy", beforeAI: "61%", afterAI: "88%", impact: "Precise roastery production" },
           { metric: "Warehouse-to-Store Lead Time", beforeAI: "18 Hours", afterAI: "11 Hours", impact: "Fresher dairy & beans" }
@@ -128,3 +130,7 @@ By using Generative AI as a **Synthetic Customer Persona**, founders can role-pl
     ]
   }
 ];
+
+export function getCaseStudies(lang) {
+  return lang === 'en' ? CASE_STUDIES : CASE_STUDIES_ID;
+}

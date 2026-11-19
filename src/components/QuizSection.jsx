@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
-import { QUIZZES } from '../data/quizzesData';
+import { getQuizzes } from '../data/quizzesData';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   CheckCircle2, 
   XCircle, 
-  HelpCircle, 
   RotateCcw, 
-  Award, 
-  Check, 
-  Info, 
-  Sparkles 
+  Info 
 } from 'lucide-react';
 
 export function QuizSection({ quizScores, onSaveQuizScore, activeQuizId, setActiveQuizId }) {
-  const currentQuiz = QUIZZES.find(q => q.id === (activeQuizId || QUIZZES[0].id)) || QUIZZES[0];
+  const { lang, isEn } = useLanguage();
+  const quizzes = getQuizzes(lang);
+  const currentQuiz = quizzes.find(q => q.id === (activeQuizId || quizzes[0].id)) || quizzes[0];
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -77,10 +76,10 @@ export function QuizSection({ quizScores, onSaveQuizScore, activeQuizId, setActi
           marginBottom: '0.25rem',
           fontFamily: 'var(--font-heading)'
         }}>
-          DDK Chapter Assessments
+          {isEn ? 'DDK Chapter Assessments' : 'Asesmen Bab DDK'}
         </div>
 
-        {QUIZZES.map((quiz) => {
+        {quizzes.map((quiz) => {
           const isActive = quiz.id === currentQuiz.id;
           const score = quizScores[quiz.id];
           return (
@@ -113,7 +112,7 @@ export function QuizSection({ quizScores, onSaveQuizScore, activeQuizId, setActi
                   {quiz.title}
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {quiz.questions.length} Questions
+                  {quiz.questions.length} {isEn ? 'Questions' : 'Pertanyaan'}
                 </div>
               </div>
               {score !== undefined && (
@@ -133,7 +132,7 @@ export function QuizSection({ quizScores, onSaveQuizScore, activeQuizId, setActi
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <span className="badge badge-gold" style={{ marginBottom: '0.5rem' }}>
-                DDK Testbank Assessment
+                {isEn ? 'DDK Testbank Assessment' : 'Asesmen Testbank DDK'}
               </span>
               <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
                 {currentQuiz.title}
@@ -148,7 +147,9 @@ export function QuizSection({ quizScores, onSaveQuizScore, activeQuizId, setActi
                   {results.percentage}%
                 </div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  {results.correct} of {results.total} questions verified
+                  {isEn
+                    ? `${results.correct} of ${results.total} questions verified`
+                    : `${results.correct} dari ${results.total} pertanyaan benar`}
                 </div>
               </div>
             )}
@@ -262,7 +263,8 @@ export function QuizSection({ quizScores, onSaveQuizScore, activeQuizId, setActi
                   color: 'var(--text-body)'
                 }}>
                   <div style={{ fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontFamily: 'var(--font-heading)' }}>
-                    <Info size={15} color="var(--ddk-primary-blue)" /> Danny Kosasih's Analysis & Rationale:
+                    <Info size={15} color="var(--ddk-primary-blue)" />{' '}
+                    {isEn ? "Danny Kosasih's Analysis & Rationale:" : 'Analisis & Rasional Danny Kosasih:'}
                   </div>
                   <div>{q.explanation}</div>
                 </div>
@@ -275,7 +277,7 @@ export function QuizSection({ quizScores, onSaveQuizScore, activeQuizId, setActi
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingBottom: '2rem' }}>
           {submitted ? (
             <button onClick={handleResetQuiz} className="btn btn-outline">
-              <RotateCcw size={16} /> Retake Assessment
+              <RotateCcw size={16} /> {isEn ? 'Retake Assessment' : 'Ulangi Asesmen'}
             </button>
           ) : (
             <button 
@@ -289,7 +291,7 @@ export function QuizSection({ quizScores, onSaveQuizScore, activeQuizId, setActi
                 cursor: Object.keys(selectedAnswers).length < currentQuiz.questions.length ? 'not-allowed' : 'pointer'
               }}
             >
-              Submit Answers ({Object.keys(selectedAnswers).length}/{currentQuiz.questions.length})
+              {isEn ? 'Submit Answers' : 'Kirim Jawaban'} ({Object.keys(selectedAnswers).length}/{currentQuiz.questions.length})
             </button>
           )}
         </div>
