@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { COURSES } from '../data/coursesData';
+import { COURSE_SPEAKER_NOTES_EN } from '../data/courseSpeakerNotesEn';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   CheckCircle2, 
   Clock, 
@@ -29,6 +31,7 @@ export function LearningMaterial({
   selectedCourseId: propCourseId,
   onSelectCourse: propSetCourseId
 }) {
+  const { isEn } = useLanguage();
   const [internalCourseId, setInternalCourseId] = useState(COURSES[0].id);
   const selectedCourseId = propCourseId !== undefined ? propCourseId : internalCourseId;
   const setSelectedCourseId = propSetCourseId || setInternalCourseId;
@@ -58,6 +61,20 @@ export function LearningMaterial({
   };
 
   const getDDKPersonaAdvice = () => {
+    if (isEn) {
+      switch(userPersona) {
+        case 'student':
+          return "Student Masterclass: Connect Kuratko's and Steve Blank's frameworks directly to your midterm and final Business Plan deliverables. Never build a product before validating a real problem in the field!";
+        case 'professional':
+          return "Corporate Intrapreneur: Use Bessant & Tidd's 4Ps framework to pitch innovation proposals to the Board without getting trapped in bureaucracy. Bring unit economics data and early validation evidence.";
+        case 'sme':
+          return "Business Owner (SME): Apply Kopi AJIB's supply chain discipline. Cut raw material spoilage and adopt lightweight AI tools to automate inventory tracking and staff scheduling.";
+        case 'founder':
+          return "Tech Startup Founder: Practice Steve Blank's 'Get Out of the Building' and Alberto Savoia's Pretotyping. Protect your cash runway by validating customer willingness to pay before writing code.";
+        default:
+          return "Innovation is a repeatable system, never mere passing intuition.";
+      }
+    }
     switch(userPersona) {
       case 'student':
         return "Student Masterclass: Pahami relasi teori Kuratko & Steve Blank dengan penyusunan Business Plan Ujian Tengah Semester & Akhir. Jangan membuat produk sebelum memvalidasi problem riil di lapangan!";
@@ -73,6 +90,106 @@ export function LearningMaterial({
   };
 
   const getDannySignatureStory = (chNum) => {
+    if (isEn) {
+      switch(chNum) {
+        case "00":
+          return {
+            analogy: "Innovation is like learning to ride a bicycle: you cannot simply read a manual on balance—you have to pedal, fall, and get back up.",
+            story: "Here is the real story: Many people assume entrepreneurs are reckless gamblers. In reality, true entrepreneurs are meticulous risk architects who turn uncertainty into measured experiments.",
+            punchline: "The lesson we take away: Entrepreneurial Self-Efficacy is not an inborn talent—it is a cognitive muscle built through real-world proof."
+          };
+        case "01":
+          return {
+            analogy: "Entrepreneurship is like a rushing river current: complacent incumbents erode against the rocks, while innovators harness the flow to accelerate ahead.",
+            story: "Here is the real story: Schumpeter observed that economies grow not because old factories keep making more of the same goods, but because bold innovators tear down legacy models with superior new ways.",
+            punchline: "The lesson we take away: Creative Destruction is a law of economic nature. You either innovate or get replaced."
+          };
+        case "02":
+          return {
+            analogy: "Innovation is like crafting a signature spice blend: you do not need to invent a brand-new botanical species in a lab—you combine existing ingredients into something extraordinary.",
+            story: "Here is the real story: Modern palm-sugar iced coffee chains did not invent coffee beans or smartphones. They executed Synthesis Innovation—fusing local palm-sugar recipes with mobile ordering apps and cloud POS.",
+            punchline: "The lesson we take away: Synthesis Innovation is the fastest highway for students and young founders to build multi-million-dollar businesses."
+          };
+        case "03":
+          return {
+            analogy: "An entrepreneurial mindset is like polarized sunglasses: where bare eyes are blinded by glare on the water and see nothing, polarized lenses cut through the reflection to reveal schools of fish swimming below.",
+            story: "Here is the real story: Two shoe salespeople were sent to a remote island. The first wired back: 'Disaster—zero opportunity here, nobody wears shoes!' The second wired back: 'Goldmine! 100% open market—everybody needs shoes!'",
+            punchline: "The lesson we take away: The field facts are identical, yet different cognitive framing produces actions 180 degrees apart."
+          };
+        case "04":
+          return {
+            analogy: "Customer Discovery is like a doctor examining a patient: a skilled physician never prescribes strong medicine before listening carefully to the patient's exact symptoms.",
+            story: "Here is the real story: Steve Blank discovered that 9 out of 10 startups fail not because their engineering is weak, but because founders fall in love with their own solution and never leave the building to meet real buyers.",
+            punchline: "The lesson we take away: 'There are no facts inside your building'—real business truths live outside with customers experiencing the pain."
+          };
+        case "05":
+          return {
+            analogy: "Design Thinking is like an architect living with a family before drawing blueprints: instead of designing a showpiece to suit the architect's ego, you observe how the family lives from morning to night.",
+            story: "Here is the real story: When IDEO redesigned toothbrushes for children, every factory assumed kids' brushes should simply be smaller, slimmer versions of adult brushes. Through empathetic observation, IDEO saw kids grip toothbrushes with a full fist because their fine motor skills are still developing.",
+            punchline: "The lesson we take away: Breakthrough solutions often contradict desk-bound assumptions. Empathetic observation is the master key."
+          };
+        case "06":
+          return {
+            analogy: "Resource marshaling is like hosting a grand dinner feast: you do not need to buy your own farm and cattle ranch—you gather the freshest ingredients from neighbors and share the feast together.",
+            story: "Here is the real story: Many founders stall for years saying 'we don't have investors yet.' Meanwhile, Airbnb started with rented air mattresses in their own living room during a design conference.",
+            punchline: "The lesson we take away: Lack of cash is not a dead end—it is a creative catalyst to unlock relational capital and lean execution."
+          };
+        case "07":
+          return {
+            analogy: "Market sizing is like fishing: you need to know how large the lake is, how many fish actually bite your bait, and how much your boat can realistically haul.",
+            story: "Here is the real story: Investors laugh when a founder claims 'The global coffee market is $400B and we only need 1%.' Bottom-up sizing grounded in real unit economics is the only credible method.",
+            punchline: "The lesson we take away: Calculate TAM from the bottom up: Target Buyers × Price per Unit × Reachable Distribution."
+          };
+        case "08":
+          return {
+            analogy: "An MVP is like building a skateboard rather than a single car wheel: a skateboard already moves you from Point A to Point B and generates learning, whereas a lone car wheel cannot be ridden at all.",
+            story: "Here is the real story: Dropbox did not begin by building millions of dollars in cloud sync infrastructure. Drew Houston recorded a 3-minute demo video showing how file syncing would work, and overnight their waitlist exploded from 5,000 to 75,000 users.",
+            punchline: "The lesson we take away: An MVP is never about how sophisticated your code is—it is about how fast you prove users will change an entrenched habit."
+          };
+        case "09":
+          return {
+            analogy: "Scaling a business is like flying a plane through a storm: if your wings and engine (unit economics) are fragile, pushing the throttle harder only breaks the aircraft apart faster.",
+            story: "Here is the real story: Countless startups burn billions on discounts and ads chasing 10x user spikes. The moment subsidies stop, users vanish because they never genuinely loved the product.",
+            punchline: "The lesson we take away: True growth is not fueled by aggressive discounts, but by organic repeat orders from customers whose lives got genuinely better."
+          };
+        case "10":
+          return {
+            analogy: "Cash flow is like oxygen to a deep-sea diver: you may have a brilliant dive plan on the ocean floor, but the second your tank runs dry, the game is over.",
+            story: "Here is the real story: A startup can grow top-line revenue by hundreds of percent while marching straight into bankruptcy if acquiring each customer costs more than that customer returns.",
+            punchline: "The lesson we take away: Maintain a CLV:CAC ratio of at least 3.0x with a payback period under 12 months."
+          };
+        case "11":
+          return {
+            analogy: "AI-driven operations work like a central nervous system: every cup scanned at the register sends an instant signal back to the warehouse and roastery without waiting for a month-end report.",
+            story: "Here is the real story: Kopi AJIB turned a Rp 77 billion operating loss into a Rp 78 billion operating profit because AI predicted hourly outlet demand, slashing milk spoilage from 9.5% down to 3.8%.",
+            punchline: "The lesson we take away: Real-time data synchronization builds an operational moat conventional cafés cannot easily copy."
+          };
+        case "12":
+          return {
+            analogy: "Managing corporate innovation is like playing doubles tennis: one partner defends the baseline steadily (the core business) while the other charges the net to score winning points (new innovation).",
+            story: "Here is the real story: Kodak actually invented the world's first digital camera in 1975. Yet out of fear of cannibalizing its analog film business, leadership locked the invention in a drawer—until the digital wave swept the company into bankruptcy.",
+            punchline: "The lesson we take away: Never fear cannibalizing your own legacy product with a better innovation—because if you won't, a competitor happily will."
+          };
+        case "13":
+          return {
+            analogy: "The Business Model Canvas is like an architectural blueprint of a house: one page showing how load-bearing pillars, entryways, plumbing, and roof lock together into a livable structure.",
+            story: "Here is the real story: Nespresso did not win by selling cheap coffee machines; it built a premium capsule ecosystem with ~85% recurring subscription-like margins, turning a one-off appliance purchase into lifetime revenue.",
+            punchline: "The lesson we take away: A great product wrapped in a weak business model will lose to a solid product powered by a superior business model."
+          };
+        case "14":
+          return {
+            analogy: "A pitch deck is like a feature-film trailer: its job is not to recite every line of the script from start to finish, but to captivate investors enough to buy a ticket into the due diligence room.",
+            story: "Here is the real story: In a 5-minute investor pitch, 80% of dense technical slides are forgotten. Investors focus on three questions: How painful is the problem, how hungry is the market, and why is your team the right one to execute?",
+            punchline: "The lesson we take away: Investors do not fund flawless ideas—they fund resilient founders who learn and execute at high velocity."
+          };
+        default:
+          return {
+            analogy: "Innovation is like lighting a lantern in the dark: every small experiment illuminates the next strategic step.",
+            story: "Here is the real story: Field-tested execution backed by data always outperforms a 100-page theoretical plan that never met a customer.",
+            punchline: "The lesson we take away: Validation precedes scale, and healthy unit economics are the true lifeblood of any venture."
+          };
+      }
+    }
     switch(chNum) {
       case "00":
         return {
@@ -174,16 +291,24 @@ export function LearningMaterial({
   };
 
   const dannyStory = getDannySignatureStory(currentCourse.number);
-  const activeSlide = slides[currentSlideIndex] || slides[0] || {
+  const rawSlide = slides[currentSlideIndex] || slides[0] || {
     number: 1,
     title: currentCourse.title,
     tag: "PRESENTATION SLIDE",
     points: currentCourse.objectives || ["Comprehensive slide deck for this chapter."],
-    speakerNotes: "Silakan gunakan deck presentasi ini sebagai panduan inti materi perkuliahan.",
+    speakerNotes: isEn
+      ? "Use this presentation deck as your core guide for the chapter lecture."
+      : "Silakan gunakan deck presentasi ini sebagai panduan inti materi perkuliahan.",
     highlight: currentCourse.keyTakeaways?.[0] || "Dharma Korporasi Academic Standard"
   };
+  const activeSpeakerNotes = isEn
+    ? (COURSE_SPEAKER_NOTES_EN[currentCourse.id]?.[currentSlideIndex] || rawSlide.speakerNotes)
+    : rawSlide.speakerNotes;
+  const activeSlide = { ...rawSlide, speakerNotes: activeSpeakerNotes };
 
-  const ddkPrompt = `Bertindaklah sebagai mentor bisnis & inovasi senior (Danny Kosasih Style). Saya sedang mempelajari "${currentCourse.title}". Berikan saya 3 pertanyaan kritis dan 1 kerangka validasi praktis untuk menguji model bisnis ventura saya.`;
+  const ddkPrompt = isEn
+    ? `Act as a senior business & innovation mentor (Danny Kosasih Style). I am currently studying "${currentCourse.title}". Give me 3 sharp diagnostic questions and 1 practical validation framework to stress-test my venture's business model.`
+    : `Bertindaklah sebagai mentor bisnis & inovasi senior (Danny Kosasih Style). Saya sedang mempelajari "${currentCourse.title}". Berikan saya 3 pertanyaan kritis dan 1 kerangka validasi praktis untuk menguji model bisnis ventura saya.`;
 
   const copyPromptToClipboard = () => {
     navigator.clipboard.writeText(ddkPrompt);
@@ -728,7 +853,9 @@ export function LearningMaterial({
             </button>
           </div>
           <p style={{ fontSize: '0.8rem', color: '#B8C7D9', marginBottom: '0.5rem' }}>
-            Gunakan prompt resmi ini di ChatGPT, Claude, atau Gemini untuk menguji kesiapan konsep bisnis Anda sesuai standar DDK:
+            {isEn
+              ? 'Use this official prompt in ChatGPT, Claude, or Gemini to stress-test your venture concept against DDK standards:'
+              : 'Gunakan prompt resmi ini di ChatGPT, Claude, atau Gemini untuk menguji kesiapan konsep bisnis Anda sesuai standar DDK:'}
           </p>
           <div style={{
             background: '#041426',

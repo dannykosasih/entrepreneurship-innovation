@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Award, Printer, X, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export function CertificateModal({ isOpen, onClose, overallScore, userPersona }) {
+  const { isEn } = useLanguage();
   const [studentName, setStudentName] = useState('Innovative Learner');
 
   if (!isOpen) return null;
@@ -55,13 +57,15 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <Award size={22} color="var(--ddk-gold)" />
             <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>
-              Pratinjau Sertifikat Resmi DDK Academy
+              {isEn ? 'Official DDK Academy Certificate Preview' : 'Pratinjau Sertifikat Resmi DDK Academy'}
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <label htmlFor="certificate-recipient" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Nama Penerima:</label>
+              <label htmlFor="certificate-recipient" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                {isEn ? 'Recipient Name:' : 'Nama Penerima:'}
+              </label>
               <input
                 id="certificate-recipient"
                 type="text"
@@ -80,7 +84,7 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
             </div>
 
             <button onClick={handlePrint} className="btn btn-gold" style={{ fontSize: '0.8rem', padding: '0.45rem 0.95rem' }}>
-              <Printer size={14} /> Cetak / Unduh PDF
+              <Printer size={14} /> {isEn ? 'Print / Download PDF' : 'Cetak / Unduh PDF'}
             </button>
             <button aria-label="Close certificate" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
               <X size={22} />
@@ -140,7 +144,7 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
           </h2>
 
           <p style={{ fontStyle: 'italic', color: '#475569', fontSize: '1rem', marginBottom: '1.25rem' }}>
-            Diberikan dengan penuh kehormatan kepada:
+            {isEn ? 'Proudly presented to:' : 'Diberikan dengan penuh kehormatan kepada:'}
           </p>
 
           <div style={{
@@ -158,7 +162,9 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
           </div>
 
           <p style={{ color: '#475569', fontSize: '0.975rem', maxWidth: '640px', margin: '0 auto 1.5rem', lineHeight: 1.6 }}>
-            atas keberhasilan menyelesaikan seluruh kurikulum terstruktur, asesmen testbank, analisis studi kasus bisnis Kopi AJIB, dan simulasi ventura pada program:
+            {isEn
+              ? 'for successfully completing the structured curriculum, testbank assessments, Kopi AJIB business case analysis, and venture simulation in the program:'
+              : 'atas keberhasilan menyelesaikan seluruh kurikulum terstruktur, asesmen testbank, analisis studi kasus bisnis Kopi AJIB, dan simulasi ventura pada program:'}
           </p>
 
           <div style={{
@@ -182,11 +188,11 @@ export function CertificateModal({ isOpen, onClose, overallScore, userPersona })
             fontSize: '0.85rem',
             marginBottom: '2.5rem'
           }}>
-            <span>Nilai Akhir: <strong style={{ color: '#0C4F8E' }}>{overallScore}% ({overallScore >= 85 ? 'Grade A' : 'Grade B+'})</strong></span>
+            <span>{isEn ? 'Final Grade:' : 'Nilai Akhir:'} <strong style={{ color: '#0C4F8E' }}>{overallScore}% ({overallScore >= 85 ? 'Grade A' : 'Grade B+'})</strong></span>
             <span>•</span>
-            <span>Diterbitkan: <strong>{currentDate}</strong></span>
+            <span>{isEn ? 'Issued:' : 'Diterbitkan:'} <strong>{currentDate}</strong></span>
             <span>•</span>
-            <span>ID Kredensial: <strong>{certificateId}</strong></span>
+            <span>{isEn ? 'Credential ID:' : 'ID Kredensial:'} <strong>{certificateId}</strong></span>
           </div>
 
           {/* DDK Official Signature */}

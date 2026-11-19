@@ -12,6 +12,7 @@ import { KnowledgeHub } from './components/KnowledgeHub';
 import { SourcesReading } from './components/SourcesReading';
 import { GradesDashboard } from './components/GradesDashboard';
 import { CertificateModal } from './components/CertificateModal';
+import { LanguageProvider } from './context/LanguageContext';
 import { COURSES } from './data/coursesData';
 import './neon.css';
 
@@ -127,6 +128,7 @@ export default function App() {
   );
 
   return (
+    <LanguageProvider>
     <div className="neon-app" data-design="neon-nights" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
       <a className="skip-link" href="#learning-content">Skip to learning content</a>
       <Navbar
@@ -236,5 +238,6 @@ export default function App() {
         userPersona={userPersona}
       />
     </div>
+    </LanguageProvider>
   );
 }

@@ -13,15 +13,10 @@ import { VpcCanvasForm } from './VpcCanvasForm';
 import { TestingLab } from './TestingLab';
 import {
   EMPTY_VPD_CANVAS,
-  EXAMPLE_VPD_CANVAS,
-  FIT_LEVELS,
-  JOB_KINDS,
-  VPD_BLOCKS,
-  VPD_BMC_RELATION,
-  VPD_REFERENCES,
-  VPD_SIDES,
   VPD_STORAGE_KEY,
 } from '../data/vpdCanvasData';
+import { getVpdContent } from '../data/vpdCanvasData.en';
+import { useLanguage } from '../context/LanguageContext';
 import {
   computeProblemSolutionFit,
   createItemId,
@@ -40,24 +35,36 @@ function loadStoredCanvas() {
   }
 }
 
-function FitMeter({ fit }) {
+function FitMeter({ fit, isEn }) {
   const tone = !fit.hasCustomerItems ? 'var(--text-muted)' : fit.score >= 80 ? 'var(--ddk-primary-blue)' : fit.score >= 50 ? '#D97706' : '#B42318';
   const label = !fit.hasCustomerItems
-    ? 'Isi profil pelanggan terlebih dahulu'
+    ? (isEn ? 'Fill in the customer profile first' : 'Isi profil pelanggan terlebih dahulu')
     : fit.score >= 80
-      ? 'Banyak tautan sudah terpasang di atas kertas — ini belum bukti fit lapangan'
+      ? (isEn
+        ? 'Most links are mapped on paper — not yet field evidence of fit'
+        : 'Banyak tautan sudah terpasang di atas kertas — ini belum bukti fit lapangan')
       : fit.score >= 50
-        ? 'Sebagian jobs, nyeri, atau manfaat masih terbuka'
-        : 'Banyak butir pelanggan belum berpasangan';
+        ? (isEn
+          ? 'Some jobs, pains, or gains remain unaddressed'
+          : 'Sebagian jobs, nyeri, atau manfaat masih terbuka')
+        : (isEn
+          ? 'Many customer items are still unlinked'
+          : 'Banyak butir pelanggan belum berpasangan');
 
   return (
     <div className="card" style={{ background: 'var(--bg-surface)', borderTop: '4px solid var(--ddk-primary-blue)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
         <div>
-          <span className="badge badge-blue" style={{ marginBottom: '0.4rem' }}>Skor tautan di kanvas</span>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Kelengkapan tautan di atas kertas</h2>
+          <span className="badge badge-blue" style={{ marginBottom: '0.4rem' }}>
+            {isEn ? 'Canvas link score' : 'Skor tautan di kanvas'}
+          </span>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
+            {isEn ? 'On-paper link completeness' : 'Kelengkapan tautan di atas kertas'}
+          </h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.35rem', maxWidth: '36rem', lineHeight: 1.6 }}>
-            Angka ini merata-ratakan berapa banyak pekerjaan, nyeri, dan manfaat pada profil yang sudah tertaut ke item di peta nilai. Ini alat bantu kelengkapan rancangan di atas kertas. Alat ini tidak mengukur apakah butir itu penting bagi pelanggan, apakah tautannya masuk akal, atau apakah sudah ada bukti wawancara, penggunaan, atau pembayaran. Skor tinggi bukan problem-solution fit, apalagi product-market fit.
+            {isEn
+              ? 'This figure averages how many jobs, pains, and gains on the customer profile are linked to items on the value map. It is an on-paper design completeness aid. It does not measure whether those items matter to customers, whether the links make sense, or whether you have interview, usage, or payment evidence. A high score is not problem-solution fit, let alone product-market fit.'
+              : 'Angka ini merata-ratakan berapa banyak pekerjaan, nyeri, dan manfaat pada profil yang sudah tertaut ke item di peta nilai. Ini alat bantu kelengkapan rancangan di atas kertas. Alat ini tidak mengukur apakah butir itu penting bagi pelanggan, apakah tautannya masuk akal, atau apakah sudah ada bukti wawancara, penggunaan, atau pembayaran. Skor tinggi bukan problem-solution fit, apalagi product-market fit.'}
           </p>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -67,9 +74,9 @@ function FitMeter({ fit }) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem', marginTop: '1rem' }}>
         {[
-          ['Pekerjaan tertangani', fit.categories.jobs],
-          ['Nyeri diredakan', fit.categories.pains],
-          ['Manfaat diciptakan', fit.categories.gains],
+          [isEn ? 'Jobs addressed' : 'Pekerjaan tertangani', fit.categories.jobs],
+          [isEn ? 'Pains relieved' : 'Nyeri diredakan', fit.categories.pains],
+          [isEn ? 'Gains created' : 'Manfaat diciptakan', fit.categories.gains],
         ].map(([title, category]) => (
           <div key={title} style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '0.75rem', background: 'var(--ddk-light-gray)' }}>
             <strong style={{ display: 'block', fontSize: '0.8rem', color: 'var(--ddk-dark)' }}>{title}</strong>
@@ -83,12 +90,14 @@ function FitMeter({ fit }) {
         <div style={{ marginTop: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.45rem' }}>
             <AlertTriangle size={15} color="#B42318" aria-hidden="true" />
-            <strong style={{ fontSize: '0.85rem', color: 'var(--ddk-dark)' }}>Belum tertangani</strong>
+            <strong style={{ fontSize: '0.85rem', color: 'var(--ddk-dark)' }}>
+              {isEn ? 'Not yet addressed' : 'Belum tertangani'}
+            </strong>
           </div>
           <ul style={{ paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.8rem', color: 'var(--text-body)' }}>
-            {fit.categories.jobs.unaddressed.map((item) => <li key={item.id}>Pekerjaan: {item.text}</li>)}
-            {fit.categories.pains.unaddressed.map((item) => <li key={item.id}>Nyeri: {item.text}</li>)}
-            {fit.categories.gains.unaddressed.map((item) => <li key={item.id}>Manfaat: {item.text}</li>)}
+            {fit.categories.jobs.unaddressed.map((item) => <li key={item.id}>{isEn ? 'Job' : 'Pekerjaan'}: {item.text}</li>)}
+            {fit.categories.pains.unaddressed.map((item) => <li key={item.id}>{isEn ? 'Pain' : 'Nyeri'}: {item.text}</li>)}
+            {fit.categories.gains.unaddressed.map((item) => <li key={item.id}>{isEn ? 'Gain' : 'Manfaat'}: {item.text}</li>)}
           </ul>
         </div>
       )}
@@ -96,18 +105,23 @@ function FitMeter({ fit }) {
         <div style={{ marginTop: '0.85rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.45rem' }}>
             <Link2 size={15} color="var(--ddk-primary-blue)" aria-hidden="true" />
-            <strong style={{ fontSize: '0.85rem', color: 'var(--ddk-dark)' }}>Item peta nilai yang belum tertaut</strong>
+            <strong style={{ fontSize: '0.85rem', color: 'var(--ddk-dark)' }}>
+              {isEn ? 'Unlinked value map items' : 'Item peta nilai yang belum tertaut'}
+            </strong>
           </div>
           <ul style={{ paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            {fit.unused.products.map((item) => <li key={item.id}>Produk & layanan: {item.text}</li>)}
-            {fit.unused.painRelievers.map((item) => <li key={item.id}>Pereda nyeri: {item.text}</li>)}
-            {fit.unused.gainCreators.map((item) => <li key={item.id}>Pencipta manfaat: {item.text}</li>)}
+            {fit.unused.products.map((item) => <li key={item.id}>{isEn ? 'Products & services' : 'Produk & layanan'}: {item.text}</li>)}
+            {fit.unused.painRelievers.map((item) => <li key={item.id}>{isEn ? 'Pain reliever' : 'Pereda nyeri'}: {item.text}</li>)}
+            {fit.unused.gainCreators.map((item) => <li key={item.id}>{isEn ? 'Gain creator' : 'Pencipta manfaat'}: {item.text}</li>)}
           </ul>
         </div>
       )}
       {fit.hasCustomerItems && fit.totals.unaddressed === 0 && fit.hasLinks && (
         <p style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.9rem', fontSize: '0.85rem', color: 'var(--ddk-primary-blue)' }}>
-          <CheckCircle2 size={16} aria-hidden="true" /> Semua butir di profil ini sudah punya pasangan di peta nilai. Itu kelengkapan rancangan, bukan bukti bahwa pelanggan peduli atau akan membeli. Utamakan butir yang penting; tidak semua keluhan kecil harus dipasangkan.
+          <CheckCircle2 size={16} aria-hidden="true" />{' '}
+          {isEn
+            ? 'Every item on this customer profile has a linked counterpart on the value map. That indicates design completeness, not proof that customers care or will pay. Focus on the most important jobs, pains, and gains; not every minor annoyance needs a match.'
+            : 'Semua butir di profil ini sudah punya pasangan di peta nilai. Itu kelengkapan rancangan, bukan bukti bahwa pelanggan peduli atau akan membeli. Utamakan butir yang penting; tidak semua keluhan kecil harus dipasangkan.'}
         </p>
       )}
     </div>
@@ -115,6 +129,17 @@ function FitMeter({ fit }) {
 }
 
 export function VpdBuilder() {
+  const { lang, isEn } = useLanguage();
+  const {
+    EXAMPLE_VPD_CANVAS,
+    FIT_LEVELS,
+    JOB_KINDS,
+    VPD_BLOCKS,
+    VPD_BMC_RELATION,
+    VPD_REFERENCES,
+    VPD_SIDES,
+  } = getVpdContent(lang);
+
   const [canvas, setCanvas] = useState(loadStoredCanvas);
   const [openBlock, setOpenBlock] = useState('jobs');
   const fit = useMemo(() => computeProblemSolutionFit(canvas), [canvas]);
@@ -158,26 +183,28 @@ export function VpdBuilder() {
       <div className="card" style={{ background: 'var(--ddk-white)', borderTop: '4px solid var(--ddk-gold)' }}>
         <span className="badge badge-gold" style={{ marginBottom: '0.4rem' }}>Value Proposition Design</span>
         <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--ddk-dark)' }}>
-          Kanvas Proposisi Nilai (Value Proposition Canvas)
+          {isEn ? 'Value Proposition Canvas' : 'Kanvas Proposisi Nilai (Value Proposition Canvas)'}
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginTop: '0.4rem', maxWidth: '52rem', lineHeight: 1.65 }}>
-          Value Proposition Canvas, sebagaimana diajarkan dalam Value Proposition Design, membesarkan dua blok Business Model Canvas: Proposisi Nilai dan Segmen Pelanggan. Cocokkan Peta Nilai dengan Profil Pelanggan — jobs pada profil ini sejalan dengan tradisi Jobs To Be Done — untuk merancang kecocokan masalah–solusi di atas kertas, lalu uji dengan bukti pelanggan sebelum mengklaim product-market fit. Contoh Kopi AJIB diambil dari studi kasus pembelajaran kursus ini, bukan dari verifikasi independen atas perusahaan publik. Angka yang tidak ada di naskah kasus ditandai sebagai ilustrasi tambahan.
+          {isEn
+            ? 'The Value Proposition Canvas, as taught in Value Proposition Design, zooms in on two blocks of the Business Model Canvas: Value Propositions and Customer Segments. Match your Value Map to a Customer Profile — whose jobs align with the Jobs To Be Done tradition — to design problem–solution fit on paper, then test with real customer evidence before claiming product-market fit. The Kopi AJIB illustration is drawn from this course’s learning case study, not an independent audit of a public company; any figures outside the case text are marked as added illustrations.'
+            : 'Value Proposition Canvas, sebagaimana diajarkan dalam Value Proposition Design, membesarkan dua blok Business Model Canvas: Proposisi Nilai dan Segmen Pelanggan. Cocokkan Peta Nilai dengan Profil Pelanggan — jobs pada profil ini sejalan dengan tradisi Jobs To Be Done — untuk merancang kecocokan masalah–solusi di atas kertas, lalu uji dengan bukti pelanggan sebelum mengklaim product-market fit. Contoh Kopi AJIB diambil dari studi kasus pembelajaran kursus ini, bukan dari verifikasi independen atas perusahaan publik. Angka yang tidak ada di naskah kasus ditandai sebagai ilustrasi tambahan.'}
         </p>
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginTop: '1rem' }}>
           <button type="button" className="btn btn-primary" onClick={handleLoadExample} style={{ fontSize: '0.8rem' }}>
-            <Sparkles size={14} /> Muat contoh ilustrasi Kopi AJIB
+            <Sparkles size={14} /> {isEn ? 'Load Kopi AJIB illustration' : 'Muat contoh ilustrasi Kopi AJIB'}
           </button>
           <button type="button" className="btn btn-outline" onClick={handleReset} style={{ fontSize: '0.8rem' }}>
-            <RotateCcw size={14} /> Reset kanvas
+            <RotateCcw size={14} /> {isEn ? 'Reset canvas' : 'Reset kanvas'}
           </button>
         </div>
         <label style={{ display: 'block', marginTop: '1rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--ddk-dark)' }}>
-          Segmen pelanggan untuk kanvas ini
+          {isEn ? 'Customer segment for this canvas' : 'Segmen pelanggan untuk kanvas ini'}
           <input
             type="text"
             value={canvas.segmentName}
             onChange={(e) => setCanvas((prev) => ({ ...prev, segmentName: e.target.value }))}
-            placeholder="Contoh: profesional muda perkantoran urban"
+            placeholder={isEn ? 'Example: young urban office professionals' : 'Contoh: profesional muda perkantoran urban'}
             style={{
               display: 'block',
               width: '100%',
@@ -192,14 +219,18 @@ export function VpdBuilder() {
           />
         </label>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.45rem' }}>
-          Satu Value Proposition Canvas untuk satu segmen. Progres tersimpan otomatis di peramban ini.
+          {isEn
+            ? 'One Value Proposition Canvas per customer segment. Progress is saved automatically in this browser.'
+            : 'Satu Value Proposition Canvas untuk satu segmen. Progres tersimpan otomatis di peramban ini.'}
         </p>
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
           <BookOpen size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Definisi kanvas dan setiap blok</h2>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
+            {isEn ? 'Canvas and block definitions' : 'Definisi kanvas dan setiap blok'}
+          </h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '1rem' }}>
           {Object.values(VPD_SIDES).map((side) => (
@@ -231,7 +262,7 @@ export function VpdBuilder() {
                     fontSize: '0.88rem',
                   }}
                 >
-                  {block.en} · {block.idLabel}
+                  {isEn ? block.en : `${block.en} · ${block.idLabel}`}
                 </button>
                 {open && (
                   <div style={{ padding: '0 1rem 1rem', background: 'var(--ddk-light-gray)' }}>
@@ -266,10 +297,12 @@ export function VpdBuilder() {
         fit={fit}
       />
 
-      <FitMeter fit={fit} />
+      <FitMeter fit={fit} isEn={isEn} />
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
-        <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.75rem' }}>Tiga tingkat kecocokan</h2>
+        <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.75rem' }}>
+          {isEn ? 'Three levels of fit' : 'Tiga tingkat kecocokan'}
+        </h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.85rem' }}>
           {FIT_LEVELS.map((level) => (
             <article key={level.id} style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '0.9rem' }}>
@@ -296,7 +329,9 @@ export function VpdBuilder() {
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
           <Quote size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Referensi</h2>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
+            {isEn ? 'References' : 'Referensi'}
+          </h2>
         </div>
         <ul style={{ paddingLeft: '1.15rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {VPD_REFERENCES.map((ref) => (
@@ -307,7 +342,9 @@ export function VpdBuilder() {
           ))}
         </ul>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.9rem', lineHeight: 1.55 }}>
-          Value Proposition Canvas adalah kerangka kerja Strategyzer (Osterwalder, Pigneur, Bernarda, dan Smith), digunakan di sini untuk tujuan pembelajaran dengan atribusi. Bagian Canvas dikutip sebagai §1.1–§1.3. Nomor halaman cetak tidak dipaksakan karena dapat berbeda antarcetakan.
+          {isEn
+            ? 'The Value Proposition Canvas is a Strategyzer framework (Osterwalder, Pigneur, Bernarda, and Smith), used here for educational purposes with attribution. Canvas sections are cited as §1.1–§1.3; print page numbers are omitted as they vary across printings.'
+            : 'Value Proposition Canvas adalah kerangka kerja Strategyzer (Osterwalder, Pigneur, Bernarda, dan Smith), digunakan di sini untuk tujuan pembelajaran dengan atribusi. Bagian Canvas dikutip sebagai §1.1–§1.3. Nomor halaman cetak tidak dipaksakan karena dapat berbeda antarcetakan.'}
         </p>
       </div>
     </div>

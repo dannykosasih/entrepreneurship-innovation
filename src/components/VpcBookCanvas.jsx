@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { JOB_KINDS, VPD_BLOCKS } from '../data/vpdCanvasData';
+import { getVpdContent } from '../data/vpdCanvasData.en';
+import { useLanguage } from '../context/LanguageContext';
 import { CanvasIcon, VPC_BLOCK_ICONS } from './CanvasIcon';
 import '../vpc-canvas.css';
 
@@ -43,8 +44,8 @@ function FaceMark() {
   );
 }
 
-function DisplaySticky({ item, listKey, selected, isPartner, isUnaddressed, isUnused, onSelect }) {
-  const jobKind = item.kind ? JOB_KINDS.find((job) => job.id === item.kind) : null;
+function DisplaySticky({ item, listKey, selected, isPartner, isUnaddressed, isUnused, onSelect, jobKinds, isEn }) {
+  const jobKind = item.kind ? jobKinds.find((job) => job.id === item.kind) : null;
   const classes = [
     'vpc-sticky',
     `vpc-sticky-${listKey}`,
@@ -61,7 +62,7 @@ function DisplaySticky({ item, listKey, selected, isPartner, isUnaddressed, isUn
       data-sticky-id={item.id}
       onClick={() => onSelect(item.id)}
       aria-pressed={selected}
-      aria-label={`${item.text}${selected ? ' (disorot)' : ''}`}
+      aria-label={`${item.text}${selected ? (isEn ? ' (highlighted)' : ' (disorot)') : ''}`}
     >
       {jobKind && <span className="sticky-kind">{jobKind.label}</span>}
       <span>{item.text}</span>
@@ -79,8 +80,10 @@ function SegmentDisplay({
   unusedIds,
   onSelect,
   onHover,
+  block,
+  jobKinds,
+  isEn,
 }) {
-  const block = VPD_BLOCKS[segment.key];
   const shortEn = {
     jobs: 'Customer Jobs',
     pains: 'Pains',
@@ -100,7 +103,7 @@ function SegmentDisplay({
           </span>
           <h3>
             {segment.key === 'products' ? <>Products &amp;<br />Services</> : shortEn}
-            <small>{block.idLabel}</small>
+            {!isEn && <small>{block.idLabel}</small>}
           </h3>
         </div>
         <div
@@ -108,7 +111,9 @@ function SegmentDisplay({
           onMouseLeave={() => onHover(null)}
         >
           {items.length === 0 && (
-            <p className="vpc-empty-seg">Belum ada isian di formulir.</p>
+            <p className="vpc-empty-seg">
+              {isEn ? 'No entries in the form yet.' : 'Belum ada isian di formulir.'}
+            </p>
           )}
           {items.map((item) => (
             <div key={item.id} onMouseEnter={() => onHover(item.id)}>
@@ -120,6 +125,8 @@ function SegmentDisplay({
                 isUnaddressed={side === 'customer' && unaddressedIds.has(item.id)}
                 isUnused={side === 'value' && unusedIds.has(item.id)}
                 onSelect={onSelect}
+                jobKinds={jobKinds}
+                isEn={isEn}
               />
             </div>
           ))}
@@ -130,6 +137,9 @@ function SegmentDisplay({
 }
 
 export function VpcBookCanvas({ canvas, fit }) {
+  const { lang, isEn } = useLanguage();
+  const { JOB_KINDS, VPD_BLOCKS } = getVpdContent(lang);
+
   const rootRef = useRef(null);
   const [selectedId, setSelectedId] = useState(null);
   const [hoverId, setHoverId] = useState(null);
@@ -232,18 +242,20 @@ export function VpcBookCanvas({ canvas, fit }) {
     <section className="vpc-book-wrap" aria-labelledby="vpc-book-title">
       <div className="vpc-book-head">
         <div>
-          <h2 id="vpc-book-title">Kanvas Proposisi Nilai, bentuk buku</h2>
+          <h2 id="vpc-book-title">
+            {isEn ? 'Value Proposition Canvas, book layout' : 'Kanvas Proposisi Nilai, bentuk buku'}
+          </h2>
           <p>
-            Tata letak mengikuti Value Proposition Canvas resmi Strategyzer (Osterwalder dan rekan):
-            Peta Nilai berbentuk persegi di kiri, Profil Pelanggan berbentuk lingkaran di kanan.
-            Kanvas ini hanya menampilkan hasil isian formulir — tambah, hapus, dan tautan dikerjakan
-            di formulir. Digambar ulang dengan CSS/SVG orisinal; ikon garis DeKa.
+            {isEn
+              ? 'Layout follows the official Strategyzer Value Proposition Canvas (Osterwalder et al.): the square Value Map on the left and the circular Customer Profile on the right. This canvas strictly displays entries from the form above — adding, deleting, and linking happen in the form. Redrawn with original CSS/SVG and DeKa line icons.'
+              : 'Tata letak mengikuti Value Proposition Canvas resmi Strategyzer (Osterwalder dan rekan): Peta Nilai berbentuk persegi di kiri, Profil Pelanggan berbentuk lingkaran di kanan. Kanvas ini hanya menampilkan hasil isian formulir — tambah, hapus, dan tautan dikerjakan di formulir. Digambar ulang dengan CSS/SVG orisinal; ikon garis DeKa.'}
           </p>
         </div>
       </div>
       <p className="vpc-book-hint">
-        Arahkan kursor atau klik tempelan untuk menyorot pasangannya. Tempelan pelanggan yang belum
-        tertaut diberi tepi merah lembut. Item peta nilai yang belum tertaut sedikit diredupkan.
+        {isEn
+          ? 'Hover over or click a sticky note to highlight its linked counterparts. Unlinked customer notes carry a soft red border; unlinked value map items are gently dimmed.'
+          : 'Arahkan kursor atau klik tempelan untuk menyorot pasangannya. Tempelan pelanggan yang belum tertaut diberi tepi merah lembut. Item peta nilai yang belum tertaut sedikit diredupkan.'}
       </p>
 
       <div className="vpc-book" ref={rootRef}>
@@ -253,7 +265,7 @@ export function VpcBookCanvas({ canvas, fit }) {
           ))}
         </svg>
 
-        <section className="vpc-value-map" aria-label="Peta Nilai (Value Map)">
+        <section className="vpc-value-map" aria-label={isEn ? 'Value Map' : 'Peta Nilai (Value Map)'}>
           <svg className="vpc-dividers" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <line x1="0" y1="0" x2="50" y2="50" />
             <line x1="0" y1="100" x2="50" y2="50" />
@@ -271,6 +283,9 @@ export function VpcBookCanvas({ canvas, fit }) {
               unusedIds={unusedIds}
               onSelect={handleSelect}
               onHover={setHoverId}
+              block={VPD_BLOCKS[segment.key]}
+              jobKinds={JOB_KINDS}
+              isEn={isEn}
             />
           ))}
           <div className="vpc-center-mark" aria-hidden="true">
@@ -279,18 +294,18 @@ export function VpcBookCanvas({ canvas, fit }) {
         </section>
 
         <div className="vpc-fit-bridge" aria-hidden="true">
-          <span className="vpc-fit-chevrons" title="Pencipta manfaat menghadap manfaat">
+          <span className="vpc-fit-chevrons" title={isEn ? 'Gain creators face gains' : 'Pencipta manfaat menghadap manfaat'}>
             <i className="vpc-chevron vpc-chevron-right" />
             <i className="vpc-chevron vpc-chevron-left" />
           </span>
           <strong>FIT</strong>
-          <span className="vpc-fit-chevrons" title="Pereda nyeri menghadap nyeri">
+          <span className="vpc-fit-chevrons" title={isEn ? 'Pain relievers face pains' : 'Pereda nyeri menghadap nyeri'}>
             <i className="vpc-chevron vpc-chevron-right" />
             <i className="vpc-chevron vpc-chevron-left" />
           </span>
         </div>
 
-        <section className="vpc-profile" aria-label="Profil Pelanggan (Customer Profile)">
+        <section className="vpc-profile" aria-label={isEn ? 'Customer Profile' : 'Profil Pelanggan (Customer Profile)'}>
           <svg className="vpc-dividers" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
             <line x1="0" y1="50" x2="50" y2="50" />
             <line x1="50" y1="50" x2="85.355" y2="14.645" />
@@ -308,6 +323,9 @@ export function VpcBookCanvas({ canvas, fit }) {
               unusedIds={unusedIds}
               onSelect={handleSelect}
               onHover={setHoverId}
+              block={VPD_BLOCKS[segment.key]}
+              jobKinds={JOB_KINDS}
+              isEn={isEn}
             />
           ))}
           <div className="vpc-center-mark" aria-hidden="true">
@@ -319,9 +337,15 @@ export function VpcBookCanvas({ canvas, fit }) {
       <p className="vpc-highlight-readout">
         {highlighted
           ? partners.length
-            ? <>Disorot: <strong>{highlighted.text}</strong> — tertaut ke {partners.join('; ')}.</>
-            : <>Disorot: <strong>{highlighted.text}</strong> — belum tertaut.</>
-          : 'Kanvas hanya menampilkan hasil formulir. Klik tempelan untuk melihat tautannya.'}
+            ? (isEn
+              ? <>Highlighted: <strong>{highlighted.text}</strong> — linked to {partners.join('; ')}.</>
+              : <>Disorot: <strong>{highlighted.text}</strong> — tertaut ke {partners.join('; ')}.</>)
+            : (isEn
+              ? <>Highlighted: <strong>{highlighted.text}</strong> — not yet linked.</>
+              : <>Disorot: <strong>{highlighted.text}</strong> — belum tertaut.</>)
+          : (isEn
+            ? 'This canvas displays your form entries. Click any sticky note to inspect its links.'
+            : 'Kanvas hanya menampilkan hasil formulir. Klik tempelan untuk melihat tautannya.')}
       </p>
     </section>
   );

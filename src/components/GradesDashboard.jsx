@@ -1,4 +1,6 @@
 import React from 'react';
+import { COURSES } from '../data/coursesData';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   GraduationCap, 
   Award, 
@@ -16,8 +18,9 @@ export function GradesDashboard({
   simulatorScore, 
   onOpenCertificate 
 }) {
-  const totalModules = 13;
-  const moduleProgressPct = Math.round((completedModules.length / totalModules) * 100);
+  const { isEn } = useLanguage();
+  const totalModules = COURSES.length || 15;
+  const moduleProgressPct = Math.min(100, Math.round((completedModules.length / totalModules) * 100));
   const moduleWeightedScore = (moduleProgressPct * 0.20);
 
   const quizScoresArr = Object.values(quizScores);
@@ -37,7 +40,7 @@ export function GradesDashboard({
 
   let letterGrade = 'F';
   let gpaPoint = 0.0;
-  let statusText = 'Perlu Peningkatan';
+  let statusText = isEn ? 'Needs Improvement' : 'Perlu Peningkatan';
   let statusColor = '#BE123C';
 
   if (totalScore >= 85) {
@@ -63,21 +66,41 @@ export function GradesDashboard({
   } else if (totalScore >= 60) {
     letterGrade = 'C+';
     gpaPoint = 2.3;
-    statusText = 'Dalam Progres';
+    statusText = isEn ? 'In Progress' : 'Dalam Progres';
     statusColor = '#D97706';
   } else {
     letterGrade = 'Incomplete';
     gpaPoint = 1.0;
-    statusText = 'Belum Memenuhi Syarat Kelulusan';
+    statusText = isEn ? 'Not Yet Eligible for Graduation' : 'Belum Memenuhi Syarat Kelulusan';
     statusColor = 'var(--text-muted)';
   }
 
   const badges = [
-    { title: "Mindset Pioneer", desc: "Tuntas Modul 0 & 1 Mindset Kuratko", earned: completedModules.includes('mod-0') || completedModules.includes('mod-1') },
-    { title: "Customer Discovery Hero", desc: "Skor >= 70% Asesmen Steve Blank", earned: (quizScores['quiz-4'] || 0) >= 70 },
-    { title: "New Retail Strategist", desc: "Tuntas Studi Kasus Kopi AJIB", earned: completedCases.includes('case-kopi-ajib') },
-    { title: "Unit Economics Master", desc: "Skor >= 70% Finansial & CAC/CLV", earned: (quizScores['quiz-10'] || 0) >= 70 },
-    { title: "Simulated Founder", desc: "Tuntas 4 Kuartal Simulasi Bisnis DDK", earned: simulatorScore !== undefined }
+    {
+      title: 'Mindset Pioneer',
+      desc: isEn ? 'Completed Modules 0 & 1 Kuratko Mindset' : 'Tuntas Modul 0 & 1 Mindset Kuratko',
+      earned: completedModules.includes('mod-0') || completedModules.includes('mod-1'),
+    },
+    {
+      title: 'Customer Discovery Hero',
+      desc: isEn ? 'Score >= 70% on Steve Blank Assessment' : 'Skor >= 70% Asesmen Steve Blank',
+      earned: (quizScores['quiz-4'] || 0) >= 70,
+    },
+    {
+      title: 'New Retail Strategist',
+      desc: isEn ? 'Completed Kopi AJIB Case Study' : 'Tuntas Studi Kasus Kopi AJIB',
+      earned: completedCases.includes('case-kopi-ajib'),
+    },
+    {
+      title: 'Unit Economics Master',
+      desc: isEn ? 'Score >= 70% on Finance & CAC/CLV' : 'Skor >= 70% Finansial & CAC/CLV',
+      earned: (quizScores['quiz-10'] || 0) >= 70,
+    },
+    {
+      title: 'Simulated Founder',
+      desc: isEn ? 'Completed 4-Quarter DDK Business Simulation' : 'Tuntas 4 Kuartal Simulasi Bisnis DDK',
+      earned: simulatorScore !== undefined,
+    },
   ];
 
   return (
@@ -90,10 +113,12 @@ export function GradesDashboard({
               DDK Academic Performance
             </span>
             <h1 style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--ddk-dark)' }}>
-              Buku Nilai & Sertifikasi DDK
+              {isEn ? 'DDK Gradebook & Certification' : 'Buku Nilai & Sertifikasi DDK'}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginTop: '0.2rem' }}>
-              Dihitung berdasarkan rubrik kurikulum resmi (Modul 20%, Kuis 30%, Studi Kasus 25%, Simulasi 25%).
+              {isEn
+                ? 'Calculated from the official curriculum rubric (Modules 20%, Quizzes 30%, Case Studies 25%, Simulation 25%).'
+                : 'Dihitung berdasarkan rubrik kurikulum resmi (Modul 20%, Kuis 30%, Studi Kasus 25%, Simulasi 25%).'}
             </p>
           </div>
 
@@ -103,7 +128,8 @@ export function GradesDashboard({
               className="btn btn-gold"
               style={{ fontSize: '0.9rem', padding: '0.75rem 1.5rem' }}
             >
-              <Award size={18} /> Buka & Cetak Sertifikat Kelulusan
+              <Award size={18} />{' '}
+              {isEn ? 'Open & Print Completion Certificate' : 'Buka & Cetak Sertifikat Kelulusan'}
             </button>
           )}
         </div>
@@ -113,7 +139,7 @@ export function GradesDashboard({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
         <div className="card" style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--ddk-white)' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>
-            TOTAL SKOR AKHIR LMS
+            {isEn ? 'OVERALL LMS SCORE' : 'TOTAL SKOR AKHIR LMS'}
           </div>
           <div style={{ fontSize: '3.25rem', fontWeight: 900, color: 'var(--ddk-primary-blue)', margin: '0.25rem 0', fontFamily: 'var(--font-heading)' }}>
             {totalScore}%
@@ -125,37 +151,39 @@ export function GradesDashboard({
 
         <div className="card" style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--ddk-white)' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>
-            NILAI HURUF (GRADE)
+            {isEn ? 'LETTER GRADE' : 'NILAI HURUF (GRADE)'}
           </div>
           <div style={{ fontSize: '3.25rem', fontWeight: 900, color: 'var(--ddk-dark)', margin: '0.25rem 0', fontFamily: 'var(--font-heading)' }}>
             {letterGrade}
           </div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-            Indeks Prestasi: <strong style={{ color: 'var(--ddk-dark)' }}>{gpaPoint.toFixed(2)}</strong> / 4.00
+            {isEn ? 'GPA:' : 'Indeks Prestasi:'} <strong style={{ color: 'var(--ddk-dark)' }}>{gpaPoint.toFixed(2)}</strong> / 4.00
           </div>
         </div>
 
         <div className="card" style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--ddk-white)' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>
-            MODUL DITUNTASKAN
+            {isEn ? 'MODULES COMPLETED' : 'MODUL DITUNTASKAN'}
           </div>
           <div style={{ fontSize: '3.25rem', fontWeight: 900, color: 'var(--ddk-primary-blue)', margin: '0.25rem 0', fontFamily: 'var(--font-heading)' }}>
             {completedModules.length}/{totalModules}
           </div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            {moduleProgressPct}% Progres Kurikulum
+            {moduleProgressPct}% {isEn ? 'Curriculum Progress' : 'Progres Kurikulum'}
           </div>
         </div>
 
         <div className="card" style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--ddk-white)' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', fontFamily: 'var(--font-heading)' }}>
-            HASIL SIMULATOR
+            {isEn ? 'SIMULATOR RESULT' : 'HASIL SIMULATOR'}
           </div>
           <div style={{ fontSize: '3.25rem', fontWeight: 900, color: simulatorScore !== undefined ? '#D97706' : 'var(--text-muted)', margin: '0.25rem 0', fontFamily: 'var(--font-heading)' }}>
             {simulatorScore !== undefined ? `${simulatorScore}` : 'N/A'}
           </div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            {simulatorScore !== undefined ? 'Uji Strategi Kuartalan' : 'Belum Dijalankan'}
+            {simulatorScore !== undefined
+              ? (isEn ? 'Quarterly Strategy Trial' : 'Uji Strategi Kuartalan')
+              : (isEn ? 'Not Run Yet' : 'Belum Dijalankan')}
           </div>
         </div>
       </div>
@@ -163,46 +191,65 @@ export function GradesDashboard({
       {/* Weighted Component Breakdown Table */}
       <div className="card" style={{ background: 'var(--ddk-white)' }}>
         <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--ddk-dark)' }}>
-          <BarChart3 size={18} color="var(--ddk-primary-blue)" /> Rincian Bobot Penilaian Silabus DDK
+          <BarChart3 size={18} color="var(--ddk-primary-blue)" />{' '}
+          {isEn ? 'DDK Syllabus Grading Breakdown' : 'Rincian Bobot Penilaian Silabus DDK'}
         </h3>
 
         <div style={{ overflowX: 'auto', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
             <thead>
               <tr style={{ background: 'var(--ddk-dark)', color: 'white', fontFamily: 'var(--font-heading)' }}>
-                <th style={{ padding: '0.85rem', textAlign: 'left' }}>Komponen Silabus</th>
-                <th style={{ padding: '0.85rem', textAlign: 'center' }}>Bobot Silabus</th>
-                <th style={{ padding: '0.85rem', textAlign: 'center' }}>Capaian Anda</th>
-                <th style={{ padding: '0.85rem', textAlign: 'right', color: 'var(--ddk-gold)' }}>Nilai Terbobot</th>
+                <th style={{ padding: '0.85rem', textAlign: 'left' }}>{isEn ? 'Syllabus Component' : 'Komponen Silabus'}</th>
+                <th style={{ padding: '0.85rem', textAlign: 'center' }}>{isEn ? 'Syllabus Weight' : 'Bobot Silabus'}</th>
+                <th style={{ padding: '0.85rem', textAlign: 'center' }}>{isEn ? 'Your Achievement' : 'Capaian Anda'}</th>
+                <th style={{ padding: '0.85rem', textAlign: 'right', color: 'var(--ddk-gold)' }}>{isEn ? 'Weighted Score' : 'Nilai Terbobot'}</th>
               </tr>
             </thead>
             <tbody>
               <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                <td style={{ padding: '0.85rem', fontWeight: 600 }}>1. Ketuntasan Modul Pembelajaran (13 Bab)</td>
+                <td style={{ padding: '0.85rem', fontWeight: 600 }}>
+                  {isEn ? `1. Learning Module Completion (${totalModules} Chapters)` : `1. Ketuntasan Modul Pembelajaran (${totalModules} Bab)`}
+                </td>
                 <td style={{ padding: '0.85rem', textAlign: 'center' }}>20%</td>
-                <td style={{ padding: '0.85rem', textAlign: 'center' }}>{completedModules.length} dari {totalModules} ({moduleProgressPct}%)</td>
+                <td style={{ padding: '0.85rem', textAlign: 'center' }}>
+                  {completedModules.length} {isEn ? 'of' : 'dari'} {totalModules} ({moduleProgressPct}%)
+                </td>
                 <td style={{ padding: '0.85rem', textAlign: 'right', fontWeight: 700 }}>{moduleWeightedScore.toFixed(1)}%</td>
               </tr>
               <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                <td style={{ padding: '0.85rem', fontWeight: 600 }}>2. Asesmen Kuis Interaktif & Testbank</td>
+                <td style={{ padding: '0.85rem', fontWeight: 600 }}>
+                  {isEn ? '2. Interactive Quizzes & Testbank Assessments' : '2. Asesmen Kuis Interaktif & Testbank'}
+                </td>
                 <td style={{ padding: '0.85rem', textAlign: 'center' }}>30%</td>
-                <td style={{ padding: '0.85rem', textAlign: 'center' }}>{avgQuizPct}% Rata-rata ({quizScoresArr.length} kuis)</td>
+                <td style={{ padding: '0.85rem', textAlign: 'center' }}>
+                  {avgQuizPct}% {isEn ? `Average (${quizScoresArr.length} quizzes)` : `Rata-rata (${quizScoresArr.length} kuis)`}
+                </td>
                 <td style={{ padding: '0.85rem', textAlign: 'right', fontWeight: 700 }}>{quizWeightedScore.toFixed(1)}%</td>
               </tr>
               <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                <td style={{ padding: '0.85rem', fontWeight: 600 }}>3. Analisis Studi Kasus (Kopi AJIB & AI Inovasi)</td>
+                <td style={{ padding: '0.85rem', fontWeight: 600 }}>
+                  {isEn ? '3. Case Study Analysis (Kopi AJIB & AI Innovation)' : '3. Analisis Studi Kasus (Kopi AJIB & AI Inovasi)'}
+                </td>
                 <td style={{ padding: '0.85rem', textAlign: 'center' }}>25%</td>
-                <td style={{ padding: '0.85rem', textAlign: 'center' }}>{completedCases.length} dari {totalCases} ({casePct}%)</td>
+                <td style={{ padding: '0.85rem', textAlign: 'center' }}>
+                  {completedCases.length} {isEn ? 'of' : 'dari'} {totalCases} ({casePct}%)
+                </td>
                 <td style={{ padding: '0.85rem', textAlign: 'right', fontWeight: 700 }}>{caseWeightedScore.toFixed(1)}%</td>
               </tr>
               <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                <td style={{ padding: '0.85rem', fontWeight: 600 }}>4. Hasil Simulasi Strategi Bisnis Ventura DDK</td>
+                <td style={{ padding: '0.85rem', fontWeight: 600 }}>
+                  {isEn ? '4. DDK Venture Strategy Simulation Result' : '4. Hasil Simulasi Strategi Bisnis Ventura DDK'}
+                </td>
                 <td style={{ padding: '0.85rem', textAlign: 'center' }}>25%</td>
-                <td style={{ padding: '0.85rem', textAlign: 'center' }}>{simPct}% Skor Ventura</td>
+                <td style={{ padding: '0.85rem', textAlign: 'center' }}>
+                  {simPct}% {isEn ? 'Venture Score' : 'Skor Ventura'}
+                </td>
                 <td style={{ padding: '0.85rem', textAlign: 'right', fontWeight: 700 }}>{simWeightedScore.toFixed(1)}%</td>
               </tr>
               <tr style={{ background: 'var(--ddk-blue-subtle)', fontWeight: 900 }}>
-                <td style={{ padding: '0.95rem 0.85rem', color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>NILAI AKHIR KOMPOSIT DDK</td>
+                <td style={{ padding: '0.95rem 0.85rem', color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>
+                  {isEn ? 'DDK COMPOSITE FINAL SCORE' : 'NILAI AKHIR KOMPOSIT DDK'}
+                </td>
                 <td style={{ padding: '0.95rem 0.85rem', textAlign: 'center' }}>100%</td>
                 <td style={{ padding: '0.95rem 0.85rem', textAlign: 'center' }}>—</td>
                 <td style={{ padding: '0.95rem 0.85rem', textAlign: 'right', color: 'var(--ddk-dark)', fontSize: '1.2rem', fontFamily: 'var(--font-heading)' }}>
@@ -217,7 +264,8 @@ export function GradesDashboard({
       {/* Achievement Badges */}
       <div className="card" style={{ background: 'var(--ddk-white)' }}>
         <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--ddk-dark)' }}>
-          <Sparkles size={18} color="var(--ddk-gold)" /> Lencana Kompetensi & Pengakuan DDK
+          <Sparkles size={18} color="var(--ddk-gold)" />{' '}
+          {isEn ? 'DDK Competency Badges & Recognition' : 'Lencana Kompetensi & Pengakuan DDK'}
         </h3>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>

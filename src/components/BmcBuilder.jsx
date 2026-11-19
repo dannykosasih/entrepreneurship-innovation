@@ -7,12 +7,13 @@ import {
   BookOpen,
   Quote,
 } from 'lucide-react';
-import { BMC_BLOCKS, BMC_BLOCK_MAP, VALUE_LENSES, DFV_LENSES, BMC_REFERENCES } from '../data/bmcBlocksData';
+import { BMC_PRESET_TEMPLATES_EN, getBmcContent } from '../data/bmcBlocksData.en';
+import { useLanguage } from '../context/LanguageContext';
 import { BMC_BLOCK_ICONS, CanvasIcon } from './CanvasIcon';
 import { TestingLab } from './TestingLab';
 import '../vpc-canvas.css';
 
-const PRESET_TEMPLATES = {
+const PRESET_TEMPLATES_ID = {
   kopiAjib: {
     name: "Kopi AJIB — template ilustrasi (studi kasus pembelajaran)",
     canvas: {
@@ -89,18 +90,6 @@ const PRESET_TEMPLATES = {
   }
 };
 
-const CANVAS_TITLES = {
-  keyPartners: '1. Key Partners · Mitra Utama',
-  keyActivities: '2. Key Activities · Aktivitas Utama',
-  keyResources: '6. Key Resources · Sumber Daya Utama',
-  valuePropositions: '3. Value Propositions · Proposisi Nilai',
-  customerRelationships: '4. Customer Relationships · Hubungan Pelanggan',
-  channels: '7. Channels · Saluran',
-  customerSegments: '5. Customer Segments · Segmen Pelanggan',
-  costStructure: '8. Cost Structure · Struktur Biaya',
-  revenueStreams: '9. Revenue Streams · Aliran Pendapatan',
-};
-
 const EMPTY_CANVAS = {
   keyPartners: [],
   keyActivities: [],
@@ -113,8 +102,8 @@ const EMPTY_CANVAS = {
   revenueStreams: [],
 };
 
-function LensBadge({ lens, kind }) {
-  const data = kind === 'value' ? VALUE_LENSES[lens] : DFV_LENSES[lens];
+function LensBadge({ lens, lenses }) {
+  const data = lenses[lens];
   if (!data) return null;
   return (
     <span className="badge" style={{
@@ -125,42 +114,57 @@ function LensBadge({ lens, kind }) {
       border: `1px solid ${data.color}55`,
       letterSpacing: '0.02em',
     }}>
-      {kind === 'value' ? data.label : data.label}
+      {data.label}
     </span>
   );
 }
 
 export function BmcBuilder() {
+  const { lang, isEn } = useLanguage();
+  const {
+    VALUE_LENSES,
+    DFV_LENSES,
+    BMC_BLOCKS,
+    BMC_BLOCK_MAP,
+    BMC_REFERENCES,
+    CANVAS_TITLES,
+  } = getBmcContent(lang);
+  const presets = isEn ? BMC_PRESET_TEMPLATES_EN : PRESET_TEMPLATES_ID;
+
   const [activeTemplate, setActiveTemplate] = useState('kopiAjib');
-  const [canvasData, setCanvasData] = useState(PRESET_TEMPLATES.kopiAjib.canvas);
+  const [customCanvas, setCustomCanvas] = useState(null);
   const [newItemText, setNewItemText] = useState({});
   const [selectedKey, setSelectedKey] = useState('valuePropositions');
   const [openGuideKey, setOpenGuideKey] = useState('customerSegments');
 
+  const canvasData = customCanvas ?? (activeTemplate === 'blank' ? EMPTY_CANVAS : presets[activeTemplate].canvas);
+
   const handleAddItem = (blockKey) => {
     const text = newItemText[blockKey]?.trim();
     if (!text) return;
-    setCanvasData(prev => ({
-      ...prev,
-      [blockKey]: [...(prev[blockKey] || []), text]
-    }));
+    setCustomCanvas((prev) => {
+      const base = prev ?? (activeTemplate === 'blank' ? EMPTY_CANVAS : presets[activeTemplate].canvas);
+      return {
+        ...base,
+        [blockKey]: [...(base[blockKey] || []), text]
+      };
+    });
     setNewItemText(prev => ({ ...prev, [blockKey]: '' }));
   };
 
   const handleRemoveItem = (blockKey, index) => {
-    setCanvasData(prev => ({
-      ...prev,
-      [blockKey]: prev[blockKey].filter((_, i) => i !== index)
-    }));
+    setCustomCanvas((prev) => {
+      const base = prev ?? (activeTemplate === 'blank' ? EMPTY_CANVAS : presets[activeTemplate].canvas);
+      return {
+        ...base,
+        [blockKey]: base[blockKey].filter((_, i) => i !== index)
+      };
+    });
   };
 
   const handleLoadTemplate = (key) => {
     setActiveTemplate(key);
-    if (key === 'blank') {
-      setCanvasData({ ...EMPTY_CANVAS });
-    } else {
-      setCanvasData(PRESET_TEMPLATES[key].canvas);
-    }
+    setCustomCanvas(null);
   };
 
   const handleExportJSON = () => {
@@ -206,7 +210,7 @@ export function BmcBuilder() {
             type="button"
             onClick={() => setSelectedKey(blockKey)}
             aria-pressed={isSelected}
-            aria-label={`Lihat definisi ${meta.idLabel}`}
+            aria-label={isEn ? `View definition of ${meta.en}` : `Lihat definisi ${meta.idLabel}`}
             style={{
               background: 'none',
               border: 'none',
@@ -234,8 +238,8 @@ export function BmcBuilder() {
               </h4>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.35rem' }}>
-              <LensBadge lens={meta.valueLens} kind="value" />
-              <LensBadge lens={meta.dfvLens} kind="dfv" />
+              <LensBadge lens={meta.valueLens} lenses={VALUE_LENSES} />
+              <LensBadge lens={meta.dfvLens} lenses={DFV_LENSES} />
             </div>
           </button>
           <span className={`badge ${isSpecial ? 'badge-gold' : 'badge-blue'}`} style={{ fontSize: '0.625rem', padding: '0.1rem 0.4rem' }}>
@@ -271,8 +275,8 @@ export function BmcBuilder() {
                   padding: 0,
                   flexShrink: 0
                 }}
-                title="Hapus"
-                aria-label={`Hapus poin dari ${meta.idLabel}`}
+                title={isEn ? 'Remove' : 'Hapus'}
+                aria-label={isEn ? `Remove item from ${meta.en}` : `Hapus poin dari ${meta.idLabel}`}
               >
                 <Trash2 size={12} />
               </button>
@@ -283,7 +287,7 @@ export function BmcBuilder() {
         <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.75rem' }}>
           <input
             type="text"
-            placeholder="Tambah poin..."
+            placeholder={isEn ? 'Add item...' : 'Tambah poin...'}
             value={newItemText[blockKey] || ''}
             onChange={(e) => setNewItemText({ ...newItemText, [blockKey]: e.target.value })}
             onKeyDown={(e) => { if (e.key === 'Enter') handleAddItem(blockKey); }}
@@ -306,7 +310,7 @@ export function BmcBuilder() {
               borderRadius: 'var(--radius-sm)',
               cursor: 'pointer'
             }}
-            aria-label={`Tambah poin ke ${meta.idLabel}`}
+            aria-label={isEn ? `Add item to ${meta.en}` : `Tambah poin ke ${meta.idLabel}`}
           >
             <Plus size={14} />
           </button>
@@ -327,13 +331,15 @@ export function BmcBuilder() {
               Business Model Canvas
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginTop: '0.35rem', maxWidth: '52rem' }}>
-              Kerangka Alexander Osterwalder dan Yves Pigneur untuk merancang, menguji, dan menyesuaikan sembilan blok bangunan yang menjelaskan bagaimana usaha Anda menciptakan, mengantarkan, dan menangkap nilai.
+              {isEn
+                ? 'Alexander Osterwalder and Yves Pigneur’s framework for designing, testing, and iterating the nine building blocks that describe how your venture creates, delivers, and captures value.'
+                : 'Kerangka Alexander Osterwalder dan Yves Pigneur untuk merancang, menguji, dan menyesuaikan sembilan blok bangunan yang menjelaskan bagaimana usaha Anda menciptakan, mengantarkan, dan menangkap nilai.'}
             </p>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button onClick={handleExportJSON} className="btn btn-outline" style={{ fontSize: '0.85rem' }}>
-              <Download size={14} /> Unduh Format JSON
+              <Download size={14} /> {isEn ? 'Download JSON' : 'Unduh Format JSON'}
             </button>
           </div>
         </div>
@@ -350,47 +356,51 @@ export function BmcBuilder() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)' }}>
-              Pilih Template:
+              {isEn ? 'Choose Template:' : 'Pilih Template:'}
             </span>
             <button
               onClick={() => handleLoadTemplate('kopiAjib')}
               className={`btn ${activeTemplate === 'kopiAjib' ? 'btn-primary' : 'btn-outline'}`}
               style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem' }}
             >
-              Kopi AJIB (ilustrasi)
+              {isEn ? 'Kopi AJIB (illustrative)' : 'Kopi AJIB (ilustrasi)'}
             </button>
             <button
               onClick={() => handleLoadTemplate('edutech')}
               className={`btn ${activeTemplate === 'edutech' ? 'btn-primary' : 'btn-outline'}`}
               style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem' }}
             >
-              EduTech AI LMS (ilustrasi)
+              {isEn ? 'EduTech AI LMS (illustrative)' : 'EduTech AI LMS (ilustrasi)'}
             </button>
             <button
               onClick={() => handleLoadTemplate('blank')}
               className={`btn ${activeTemplate === 'blank' ? 'btn-primary' : 'btn-outline'}`}
               style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem' }}
             >
-              Kanvas Kosong
+              {isEn ? 'Blank Canvas' : 'Kanvas Kosong'}
             </button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Kelengkapan isian:
+              {isEn ? 'Canvas completeness:' : 'Kelengkapan isian:'}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '1.2rem', fontWeight: 900, color: healthScore >= 80 ? 'var(--ddk-primary-blue)' : '#D97706', fontFamily: 'var(--font-heading)' }}>
                 {healthScore}%
               </span>
               <span className={`badge ${healthScore >= 80 ? 'badge-gold' : 'badge-soft'}`}>
-                {healthScore >= 80 ? 'Lengkap' : 'Masih ada blok kosong'}
+                {healthScore >= 80
+                  ? (isEn ? 'Complete' : 'Lengkap')
+                  : (isEn ? 'Empty blocks remain' : 'Masih ada blok kosong')}
               </span>
             </div>
           </div>
         </div>
         <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.75rem', lineHeight: 1.55 }}>
-          Skor ini hanya mengukur apakah sembilan blok sudah diisi, bukan apakah model sudah divalidasi di lapangan. Contoh di template adalah ilustrasi pembelajaran.
+          {isEn
+            ? 'This score only measures whether all nine blocks have been filled in, not whether the business model has been validated in the field. Template items are illustrative learning examples.'
+            : 'Skor ini hanya mengukur apakah sembilan blok sudah diisi, bukan apakah model sudah divalidasi di lapangan. Contoh di template adalah ilustrasi pembelajaran.'}
         </p>
       </div>
 
@@ -398,17 +408,23 @@ export function BmcBuilder() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.85rem' }}>
           <LayoutGrid size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
           <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)', letterSpacing: '-0.02em' }}>
-            Dua lensa untuk membaca sembilan blok
+            {isEn ? 'Two lenses for reading the nine blocks' : 'Dua lensa untuk membaca sembilan blok'}
           </h2>
         </div>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '0.75rem' }}>
-          Model bisnis, menurut Osterwalder dan Pigneur dalam Business Model Generation (bagian “Definition of a Business Model”), adalah alasan mendasar bagaimana organisasi menciptakan, mengantarkan, dan menangkap nilai. Buku yang sama juga menata sembilan blok ke empat wilayah: pelanggan, tawaran, infrastruktur, dan kelayakan finansial.
+          {isEn
+            ? 'A business model, according to Osterwalder and Pigneur in Business Model Generation ("Definition of a Business Model"), describes the rationale of how an organization creates, delivers, and captures value. The same book also organizes the nine building blocks into four main areas: customers, offer, infrastructure, and financial viability.'
+            : 'Model bisnis, menurut Osterwalder dan Pigneur dalam Business Model Generation (bagian “Definition of a Business Model”), adalah alasan mendasar bagaimana organisasi menciptakan, mengantarkan, dan menangkap nilai. Buku yang sama juga menata sembilan blok ke empat wilayah: pelanggan, tawaran, infrastruktur, dan kelayakan finansial.'}
         </p>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '0.75rem' }}>
-          Pembagian tiap blok ke Creating, Delivering, dan Capturing Value di halaman ini adalah konvensi pengajaran, bukan tabel resmi di Business Model Generation (2010). Kami menempatkan tawaran dan infrastruktur (VP, KP, KA, KR) pada menciptakan nilai; saluran, hubungan, dan segmen (CH, CR, CS) pada mengantarkan nilai; serta pendapatan dan biaya (RS, C$) pada menangkap nilai.
+          {isEn
+            ? 'Assigning each block to Creating, Delivering, and Capturing Value on this page is a teaching convention rather than a formal table in Business Model Generation (2010). Here we place the offer and infrastructure (VP, KP, KA, KR) under Creating Value; channels, relationships, and segments (CH, CR, CS) under Delivering Value; and revenue and costs (RS, C$) under Capturing Value.'
+            : 'Pembagian tiap blok ke Creating, Delivering, dan Capturing Value di halaman ini adalah konvensi pengajaran, bukan tabel resmi di Business Model Generation (2010). Kami menempatkan tawaran dan infrastruktur (VP, KP, KA, KR) pada menciptakan nilai; saluran, hubungan, dan segmen (CH, CR, CS) pada mengantarkan nilai; serta pendapatan dan biaya (RS, C$) pada menangkap nilai.'}
         </p>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: '1rem' }}>
-          Lensa kedua — Desirability, Feasibility, dan Viability — berasal dari design thinking IDEO: apakah tawaran diinginkan, dapat diwujudkan, dan layak secara ekonomi. Pemasangan ketiga lensa itu ke sembilan blok BMC (Desirability: CS, VP, CH, CR; Feasibility: KP, KA, KR; Viability: RS, C$) adalah konvensi Strategyzer, misalnya dalam Testing Business Ideas (Bland & Osterwalder, 2019) dan artikel Osterwalder (2017). Ini lensa risiko untuk merancang tes, bukan sekat yang saling meniadakan: harga atau saluran dapat menyentuh lebih dari satu lensa. Klik judul blok pada kanvas untuk melihat definisi, pertanyaan pemandu, dan contoh berlabel ilustrasi.
+          {isEn
+            ? 'The second lens — Desirability, Feasibility, and Viability — comes from IDEO design thinking: whether an offering is wanted by customers, can be built and operated, and makes economic sense. Overlaying these three lenses onto the nine BMC blocks (Desirability: CS, VP, CH, CR; Feasibility: KP, KA, KR; Viability: RS, C$) is a Strategyzer convention, such as in Testing Business Ideas (Bland & Osterwalder, 2019) and Osterwalder (2017). Treat them as risk lenses for designing tests rather than rigid silos: pricing or channels often span multiple lenses. Click any block title on the canvas to inspect its definition, guiding questions, and illustrative examples.'
+            : 'Lensa kedua — Desirability, Feasibility, dan Viability — berasal dari design thinking IDEO: apakah tawaran diinginkan, dapat diwujudkan, dan layak secara ekonomi. Pemasangan ketiga lensa itu ke sembilan blok BMC (Desirability: CS, VP, CH, CR; Feasibility: KP, KA, KR; Viability: RS, C$) adalah konvensi Strategyzer, misalnya dalam Testing Business Ideas (Bland & Osterwalder, 2019) dan artikel Osterwalder (2017). Ini lensa risiko untuk merancang tes, bukan sekat yang saling meniadakan: harga atau saluran dapat menyentuh lebih dari satu lensa. Klik judul blok pada kanvas untuk melihat definisi, pertanyaan pemandu, dan contoh berlabel ilustrasi.'}
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.85rem' }}>
           {Object.values(VALUE_LENSES).map((lens) => (
@@ -436,18 +452,18 @@ export function BmcBuilder() {
             <div>
               <span className="badge badge-blue" style={{ marginBottom: '0.4rem' }}>{selectedBlock.code}</span>
               <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
-                {selectedBlock.en} · {selectedBlock.idLabel}
+                {isEn ? selectedBlock.en : `${selectedBlock.en} · ${selectedBlock.idLabel}`}
               </h2>
             </div>
             <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
-              <LensBadge lens={selectedBlock.valueLens} kind="value" />
-              <LensBadge lens={selectedBlock.dfvLens} kind="dfv" />
+              <LensBadge lens={selectedBlock.valueLens} lenses={VALUE_LENSES} />
+              <LensBadge lens={selectedBlock.dfvLens} lenses={DFV_LENSES} />
             </div>
           </div>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.75rem' }}>{selectedBlock.definition}</p>
           {selectedBlock.questions && (
             <p style={{ fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.7rem' }}>
-              <strong>Pertanyaan pemandu.</strong> {selectedBlock.questions}
+              <strong>{isEn ? 'Guiding questions.' : 'Pertanyaan pemandu.'}</strong> {selectedBlock.questions}
             </p>
           )}
           <p style={{ fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.7rem' }}>
@@ -459,7 +475,9 @@ export function BmcBuilder() {
 
       <div className="bmc-book-canvas" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-          Tata letak sembilan blok mengikuti Business Model Generation: mitra, aktivitas, sumber daya, proposisi nilai, hubungan, saluran, dan segmen di baris atas; struktur biaya dan aliran pendapatan di baris bawah. Ikon orisinal DeKa.
+          {isEn
+            ? 'The nine-block layout follows Business Model Generation: partners, activities, resources, value propositions, relationships, channels, and customer segments on the upper row; cost structure and revenue streams along the bottom. Original DeKa line icons.'
+            : 'Tata letak sembilan blok mengikuti Business Model Generation: mitra, aktivitas, sumber daya, proposisi nilai, hubungan, saluran, dan segmen di baris atas; struktur biaya dan aliran pendapatan di baris bawah. Ikon orisinal DeKa.'}
         </p>
         <div style={{
           display: 'grid',
@@ -492,10 +510,14 @@ export function BmcBuilder() {
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
           <BookOpen size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Panduan sembilan blok</h2>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
+            {isEn ? 'Guide to the nine building blocks' : 'Panduan sembilan blok'}
+          </h2>
         </div>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: 1.6 }}>
-          Urutan di bawah mengikuti cara mengajarkan kanvas: mulai dari pelanggan, lalu tawaran, saluran, hubungan, pendapatan, baru sisi infrastruktur dan biaya. Contoh di seluruh blok memakai usaha yang sama, Kopi AJIB, agar hubungan antarblok terlihat utuh. Contoh Kopi AJIB diambil dari studi kasus pembelajaran kursus ini, bukan dari verifikasi independen atas perusahaan publik. Angka yang tidak ada di naskah kasus ditandai sebagai ilustrasi tambahan.
+          {isEn
+            ? 'The sequence below follows the recommended teaching order: start with customers, then the offering, channels, relationships, and revenue streams, before moving to infrastructure and costs. All nine blocks use the same venture — Kopi AJIB — so cross-block linkages stay clear. Kopi AJIB figures come from this course’s learning case study rather than an independent verification of a public company; any numbers outside the case text are labeled as added illustrations.'
+            : 'Urutan di bawah mengikuti cara mengajarkan kanvas: mulai dari pelanggan, lalu tawaran, saluran, hubungan, pendapatan, baru sisi infrastruktur dan biaya. Contoh di seluruh blok memakai usaha yang sama, Kopi AJIB, agar hubungan antarblok terlihat utuh. Contoh Kopi AJIB diambil dari studi kasus pembelajaran kursus ini, bukan dari verifikasi independen atas perusahaan publik. Angka yang tidak ada di naskah kasus ditandai sebagai ilustrasi tambahan.'}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
           {BMC_BLOCKS.map((block) => {
@@ -521,11 +543,11 @@ export function BmcBuilder() {
                   }}
                 >
                   <span style={{ fontWeight: 800, color: 'var(--ddk-dark)', fontFamily: 'var(--font-heading)', fontSize: '0.9rem' }}>
-                    {block.code}. {block.en} · {block.idLabel}
+                    {isEn ? `${block.code}. ${block.en}` : `${block.code}. ${block.en} · ${block.idLabel}`}
                   </span>
                   <span style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                    <LensBadge lens={block.valueLens} kind="value" />
-                    <LensBadge lens={block.dfvLens} kind="dfv" />
+                    <LensBadge lens={block.valueLens} lenses={VALUE_LENSES} />
+                    <LensBadge lens={block.dfvLens} lenses={DFV_LENSES} />
                   </span>
                 </button>
                 {open && (
@@ -533,7 +555,7 @@ export function BmcBuilder() {
                     <p style={{ fontSize: '0.875rem', color: 'var(--text-body)', lineHeight: 1.65 }}>{block.definition}</p>
                     {block.questions && (
                       <p style={{ fontSize: '0.85rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.65rem' }}>
-                        <strong>Pertanyaan pemandu.</strong> {block.questions}
+                        <strong>{isEn ? 'Guiding questions.' : 'Pertanyaan pemandu.'}</strong> {block.questions}
                       </p>
                     )}
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-body)', lineHeight: 1.65, marginTop: '0.65rem' }}>
@@ -553,7 +575,9 @@ export function BmcBuilder() {
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
           <Quote size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>Referensi</h2>
+          <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ddk-dark)' }}>
+            {isEn ? 'References' : 'Referensi'}
+          </h2>
         </div>
         <ul style={{ paddingLeft: '1.15rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {BMC_REFERENCES.map((ref) => (
@@ -564,7 +588,9 @@ export function BmcBuilder() {
           ))}
         </ul>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.9rem', lineHeight: 1.55 }}>
-          Business Model Canvas adalah kerangka kerja Strategyzer (Osterwalder & Pigneur), digunakan di sini untuk tujuan pembelajaran dengan atribusi. Nomor halaman tidak dicantumkan karena berbeda antarcetakan.
+          {isEn
+            ? 'The Business Model Canvas is a Strategyzer framework (Osterwalder & Pigneur), used here for educational purposes with attribution. Print page numbers are omitted as they vary across printings.'
+            : 'Business Model Canvas adalah kerangka kerja Strategyzer (Osterwalder & Pigneur), digunakan di sini untuk tujuan pembelajaran dengan atribusi. Nomor halaman tidak dicantumkan karena berbeda antarcetakan.'}
         </p>
       </div>
     </div>

@@ -6,6 +6,11 @@ import {
   TESTING_CHECKLIST,
   TESTING_STORAGE_KEYS,
 } from '../data/testingLabData';
+import {
+  EXAMPLE_ASSUMPTIONS_EN,
+  EXAMPLE_LEARNING_CARDS_EN,
+  EXAMPLE_TEST_CARDS_EN,
+} from '../data/testingLabData.en';
 import { createItemId } from './vpdFit';
 
 export function emptyLab() {
@@ -97,7 +102,12 @@ export function riskScore(importance, evidence) {
   return clampScore(importance) * (6 - clampScore(evidence));
 }
 
-export function riskLabel(score) {
+export function riskLabel(score, lang = 'id') {
+  if (lang === 'en') {
+    if (score >= 16) return 'riskiest';
+    if (score >= 10) return 'test soon';
+    return 'stronger evidence';
+  }
   if (score >= 16) return 'paling berisiko';
   if (score >= 10) return 'perlu diuji segera';
   return 'bukti sudah lebih kuat';
@@ -112,16 +122,17 @@ export function rankAssumptions(items) {
 }
 
 const VPD_SOURCES = [
-  { key: 'jobs', source: 'Pekerjaan pelanggan', lens: 'desirability', prefix: 'Pelanggan memiliki pekerjaan:' },
-  { key: 'pains', source: 'Nyeri pelanggan', lens: 'desirability', prefix: 'Nyeri yang cukup penting untuk diatasi:' },
-  { key: 'gains', source: 'Manfaat pelanggan', lens: 'desirability', prefix: 'Manfaat yang diinginkan pelanggan:' },
-  { key: 'products', source: 'Produk dan layanan', lens: 'desirability', prefix: 'Produk atau layanan ini membantu menyelesaikan pekerjaan:' },
-  { key: 'painRelievers', source: 'Pereda nyeri', lens: 'desirability', prefix: 'Pereda ini benar-benar meredakan nyeri:' },
-  { key: 'gainCreators', source: 'Pencipta manfaat', lens: 'desirability', prefix: 'Pencipta manfaat ini benar-benar menghasilkan manfaat:' },
+  { key: 'jobs', source: 'Pekerjaan pelanggan', sourceEn: 'Customer jobs', lens: 'desirability', prefix: 'Pelanggan memiliki pekerjaan:', prefixEn: 'Customers have the job:' },
+  { key: 'pains', source: 'Nyeri pelanggan', sourceEn: 'Customer pains', lens: 'desirability', prefix: 'Nyeri yang cukup penting untuk diatasi:', prefixEn: 'Pain important enough to solve:' },
+  { key: 'gains', source: 'Manfaat pelanggan', sourceEn: 'Customer gains', lens: 'desirability', prefix: 'Manfaat yang diinginkan pelanggan:', prefixEn: 'Gain desired by customers:' },
+  { key: 'products', source: 'Produk dan layanan', sourceEn: 'Products & services', lens: 'desirability', prefix: 'Produk atau layanan ini membantu menyelesaikan pekerjaan:', prefixEn: 'This product or service helps complete the job:' },
+  { key: 'painRelievers', source: 'Pereda nyeri', sourceEn: 'Pain relievers', lens: 'desirability', prefix: 'Pereda ini benar-benar meredakan nyeri:', prefixEn: 'This reliever truly alleviates the pain:' },
+  { key: 'gainCreators', source: 'Pencipta manfaat', sourceEn: 'Gain creators', lens: 'desirability', prefix: 'Pencipta manfaat ini benar-benar menghasilkan manfaat:', prefixEn: 'This gain creator truly produces the gain:' },
 ];
 
-export function extractHypothesesFromVpd(canvas) {
+export function extractHypothesesFromVpd(canvas, lang = 'id') {
   if (!canvas || typeof canvas !== 'object') return [];
+  const isEn = lang === 'en';
   const items = [];
   for (const field of VPD_SOURCES) {
     const list = Array.isArray(canvas[field.key]) ? canvas[field.key] : [];
@@ -129,9 +140,9 @@ export function extractHypothesesFromVpd(canvas) {
       if (!entry || typeof entry.text !== 'string' || !entry.text.trim()) continue;
       items.push({
         id: `extracted-${field.key}-${entry.id || items.length}`,
-        text: `${field.prefix} ${entry.text.trim()}`,
+        text: `${isEn ? field.prefixEn : field.prefix} ${entry.text.trim()}`,
         lens: field.lens,
-        source: field.source,
+        source: isEn ? field.sourceEn : field.source,
         importance: 3,
         evidence: 1,
       });
@@ -140,19 +151,21 @@ export function extractHypothesesFromVpd(canvas) {
   return items;
 }
 
-export function extractHypothesesFromBmc(canvasData) {
+export function extractHypothesesFromBmc(canvasData, lang = 'id') {
   if (!canvasData || typeof canvasData !== 'object') return [];
+  const isEn = lang === 'en';
   const items = [];
   for (const block of BMC_BLOCKS) {
     const list = Array.isArray(canvasData[block.key]) ? canvasData[block.key] : [];
+    const label = isEn ? block.en : block.idLabel;
     for (const entry of list) {
       const text = typeof entry === 'string' ? entry : entry?.text;
       if (!text || !String(text).trim()) continue;
       items.push({
         id: `extracted-${block.key}-${items.length}`,
-        text: `${block.idLabel}: ${String(text).trim()}`,
+        text: `${label}: ${String(text).trim()}`,
         lens: block.dfvLens || 'desirability',
-        source: block.idLabel,
+        source: label,
         importance: 3,
         evidence: 1,
       });
@@ -161,12 +174,13 @@ export function extractHypothesesFromBmc(canvasData) {
   return items;
 }
 
-export function exampleLab(scope) {
+export function exampleLab(scope, lang = 'id') {
   const key = scope === 'bmc' ? 'bmc' : 'vpd';
+  const isEn = lang === 'en';
   return normalizeLab({
-    assumptions: EXAMPLE_ASSUMPTIONS[key],
-    testCards: EXAMPLE_TEST_CARDS[key],
-    learningCards: EXAMPLE_LEARNING_CARDS[key],
+    assumptions: (isEn ? EXAMPLE_ASSUMPTIONS_EN : EXAMPLE_ASSUMPTIONS)[key],
+    testCards: (isEn ? EXAMPLE_TEST_CARDS_EN : EXAMPLE_TEST_CARDS)[key],
+    learningCards: (isEn ? EXAMPLE_LEARNING_CARDS_EN : EXAMPLE_LEARNING_CARDS)[key],
     checklist: {},
   });
 }

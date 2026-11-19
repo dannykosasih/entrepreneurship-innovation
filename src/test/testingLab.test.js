@@ -100,3 +100,29 @@ describe('example content', () => {
     expect(TESTING_REFERENCES.some((ref) => /Testing Business Ideas/.test(ref.citation))).toBe(true);
   });
 });
+import { EXAMPLE_VPD_CANVAS_EN } from '../data/vpdCanvasData.en';
+import { getTestingLabContent } from '../data/testingLabData.en';
+import { computeProblemSolutionFit } from '../lib/vpdFit';
+
+describe('English localization helpers', () => {
+  it('returns English risk labels, example cards, hypotheses, and 100% VPD fit', () => {
+    expect(riskLabel(25, 'en')).toBe('riskiest');
+    expect(riskLabel(14, 'en')).toBe('test soon');
+    expect(riskLabel(4, 'en')).toBe('stronger evidence');
+
+    const enVpdLab = exampleLab('vpd', 'en');
+    expect(enVpdLab.testCards[0].name).toMatch(/Queue & order-ahead test/);
+    expect(enVpdLab.testCards[0].criteria).toMatch(/Illustrative/i);
+
+    const enHypotheses = extractHypothesesFromVpd(EXAMPLE_VPD_CANVAS_EN, 'en');
+    expect(enHypotheses.some((item) => item.source === 'Pain relievers')).toBe(true);
+    expect(enHypotheses.some((item) => /Long café queues/.test(item.text))).toBe(true);
+
+    const enContent = getTestingLabContent('en');
+    expect(enContent.EXPERIMENT_TYPES).toHaveLength(16);
+    expect(enContent.CLASSIFICATION_NOTE).toMatch(/Simple Landing Page/);
+    expect(enContent.CLASSIFICATION_NOTE).toMatch(/Feature Stub/);
+
+    expect(computeProblemSolutionFit(EXAMPLE_VPD_CANVAS_EN).score).toBe(100);
+  });
+});

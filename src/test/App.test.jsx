@@ -155,4 +155,81 @@ describe('Neon Nights LMS regression', () => {
     await user.click(screen.getByRole('button',{name:'Muat contoh ilustrasi Kartu Tes Kopi AJIB'}));
     expect(JSON.parse(localStorage.getItem('innoventures_testing_lab_bmc')).testCards[0].lens).toBe('viability');
   });
+
+  it('toggles all views between ID and EN and persists language choice', async () => {
+    const user = userEvent.setup();
+    const view = render(<App />);
+
+    const langGroup = screen.getByRole('group', { name: /Pilih bahasa|Language switch/i });
+    const idBtn = within(langGroup).getByRole('button', { name: 'ID' });
+    const enBtn = within(langGroup).getByRole('button', { name: 'EN' });
+    expect(idBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(enBtn).toHaveAttribute('aria-pressed', 'false');
+    expect(document.documentElement.lang).toBe('id');
+
+    // Switch to English
+    await user.click(enBtn);
+    expect(enBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(idBtn).toHaveAttribute('aria-pressed', 'false');
+    expect(localStorage.getItem('ddk_lms_lang')).toBe('en');
+    expect(document.documentElement.lang).toBe('en');
+
+    // Dashboard & Sidebar localized
+    expect(nav('Explore & tools', 'Value Proposition Design')).toBeInTheDocument();
+    expect(screen.getByText('Match your Value Map with Jobs To Be Done')).toBeInTheDocument();
+
+    // Learning Material (speaker notes, Danny story, DeKa prompt)
+    await user.click(screen.getByRole('button', { name: 'Continue learning' }));
+    expect(screen.getByText(/Use this official prompt in ChatGPT, Claude, or Gemini/)).toBeInTheDocument();
+    expect(screen.getByText(/Act as a senior business & innovation mentor/)).toBeInTheDocument();
+
+    // Case Studies
+    await user.click(nav('Explore & tools', 'Case library'));
+    expect(screen.getAllByPlaceholderText('Write your critical analysis here...').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/IDR Billion/).length).toBeGreaterThan(0);
+
+    // Startup Simulator
+    await user.click(nav('Explore & tools', 'Startup simulator'));
+    expect(screen.getByRole('button', { name: 'Run Simulation & Calculate DDK Performance' })).toBeInTheDocument();
+
+    // BMC Builder + Testing Lab
+    await user.click(nav('Explore & tools', 'BMC Strategy Tool'));
+    expect(screen.getAllByPlaceholderText('Add item...')).toHaveLength(9);
+    expect(screen.getByRole('button', { name: /Download JSON/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'How to Test' })).toBeInTheDocument();
+
+    // VPD Builder + Book Canvas + Testing Lab
+    await user.click(nav('Explore & tools', 'Value Proposition Design'));
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/^Value Proposition Canvas$/);
+    expect(screen.getByRole('heading', { name: 'Fill in the canvas via form' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Value Map' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Customer Profile' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Load Kopi AJIB illustration' }));
+    expect(screen.getByText('100%')).toBeInTheDocument();
+    expect(screen.getByLabelText('We believe that…')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save Test Card' })).toBeInTheDocument();
+
+    // Knowledge Hub
+    await user.click(nav('Explore & tools', 'Knowledge wiki'));
+    expect(screen.getByPlaceholderText('Search concepts, formulas, authors...')).toBeInTheDocument();
+
+    // Grades & Certificate Modal
+    await user.click(nav('Learning space', 'Learning calendar & Grades'));
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('DDK Gradebook & Certification');
+    await user.click(screen.getAllByRole('button', { name: 'DDK Credential' })[0]);
+    expect(screen.getByLabelText('Recipient Name:')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Close certificate' }));
+
+    // Persists across remount & switches back to ID
+    view.unmount();
+    render(<App />);
+    expect(document.documentElement.lang).toBe('en');
+    expect(nav('Explore & tools', 'Value Proposition Design')).toBeInTheDocument();
+
+    const remountedLangGroup = screen.getByRole('group', { name: /Pilih bahasa|Language switch/i });
+    await user.click(within(remountedLangGroup).getByRole('button', { name: 'ID' }));
+    expect(localStorage.getItem('ddk_lms_lang')).toBe('id');
+    expect(document.documentElement.lang).toBe('id');
+    expect(nav('Explore & tools', 'VPD Proposisi Nilai')).toBeInTheDocument();
+  });
 });

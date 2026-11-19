@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CASE_STUDIES } from '../data/caseStudiesData';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   Building2, 
   TrendingUp, 
@@ -14,12 +15,15 @@ import {
 } from 'lucide-react';
 
 export function CaseStudies({ onMarkCaseComplete, completedCases }) {
+  const { isEn } = useLanguage();
   const [selectedCaseId, setSelectedCaseId] = useState(CASE_STUDIES[0].id);
   const [userAnswers, setUserAnswers] = useState({});
   const [revealedGuidance, setRevealedGuidance] = useState({});
 
   const currentCase = CASE_STUDIES.find(c => c.id === selectedCaseId) || CASE_STUDIES[0];
   const isDone = completedCases.includes(currentCase.id);
+
+  const formatMetric = (text) => (isEn ? text.replace(/Rp Miliar/g, 'IDR Billion') : text);
 
   const handleAnswerChange = (idx, text) => {
     setUserAnswers(prev => ({ ...prev, [`${currentCase.id}-${idx}`]: text }));
@@ -147,7 +151,7 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                           fontWeight: row.metric.includes('Operating Income') || row.metric.includes('Gross Profit') ? 700 : 400
                         }}
                       >
-                        <td style={{ padding: '0.75rem 0.85rem' }}>{row.metric}</td>
+                        <td style={{ padding: '0.75rem 0.85rem' }}>{formatMetric(row.metric)}</td>
                         <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right' }}>{row.y2021}</td>
                         <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right' }}>{row.y2022}</td>
                         <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right' }}>{row.y2023}</td>
@@ -200,7 +204,7 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                         <td style={{ padding: '0.75rem 0.8rem', fontWeight: 600 }}>{sc.metric}</td>
                         <td style={{ padding: '0.75rem 0.8rem', textAlign: 'center', color: '#BE123C', fontWeight: 700 }}>{sc.beforeAI}</td>
                         <td style={{ padding: '0.75rem 0.8rem', textAlign: 'center', color: 'var(--ddk-dark)', fontWeight: 800 }}>{sc.afterAI}</td>
-                        <td style={{ padding: '0.75rem 0.8rem', color: 'var(--text-secondary)' }}>{sc.impact}</td>
+                        <td style={{ padding: '0.75rem 0.8rem', color: 'var(--text-secondary)' }}>{formatMetric(sc.impact)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -219,7 +223,9 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
             </h3>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginBottom: '1.5rem' }}>
-            Tuliskan analisis strategis Anda di bawah ini, kemudian klik tombol untuk melihat panduan evaluasi resmi dari tim fasilitator.
+            {isEn
+              ? 'Write your strategic analysis below, then click the button to reveal the official facilitator evaluation guide.'
+              : 'Tuliskan analisis strategis Anda di bawah ini, kemudian klik tombol untuk melihat panduan evaluasi resmi dari tim fasilitator.'}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -240,7 +246,7 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
 
                   <textarea
                     rows={3}
-                    placeholder="Tuliskan analisis kritis Anda di sini..."
+                    placeholder={isEn ? 'Write your critical analysis here...' : 'Tuliskan analisis kritis Anda di sini...'}
                     value={userAnswers[answerKey] || ''}
                     onChange={(e) => handleAnswerChange(qIdx, e.target.value)}
                     style={{
@@ -263,7 +269,10 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                       className="btn btn-outline"
                       style={{ fontSize: '0.8rem', padding: '0.4rem 0.85rem' }}
                     >
-                      <Eye size={14} color="var(--ddk-primary-blue)" /> {isRevealed ? 'Tutup Panduan DDK' : 'Buka Kunci Panduan Solusi DDK'}
+                      <Eye size={14} color="var(--ddk-primary-blue)" />{' '}
+                      {isEn
+                        ? (isRevealed ? 'Hide DDK Guide' : 'Reveal DDK Solution Guide')
+                        : (isRevealed ? 'Tutup Panduan DDK' : 'Buka Kunci Panduan Solusi DDK')}
                     </button>
                   </div>
 
@@ -278,7 +287,9 @@ export function CaseStudies({ onMarkCaseComplete, completedCases }) {
                       color: 'var(--ddk-dark)'
                     }}>
                       <div style={{ fontWeight: 800, marginBottom: '0.25rem', fontFamily: 'var(--font-heading)' }}>
-                        Panduan Evaluasi Fasilitator (Danny Kosasih & Tim):
+                        {isEn
+                          ? 'Facilitator Evaluation Guide (Danny Kosasih & Team):'
+                          : 'Panduan Evaluasi Fasilitator (Danny Kosasih & Tim):'}
                       </div>
                       <div>{dq.guidance}</div>
                     </div>

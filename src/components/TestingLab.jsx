@@ -1,22 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FlaskConical, Quote, RotateCcw, Sparkles, Trash2 } from 'lucide-react';
-import {
-  CLASSIFICATION_NOTE,
-  DECISIONS,
-  EXPERIMENT_GROUPS,
-  EXPERIMENT_TYPES,
-  FIT_CHECKS,
-  LEARNING_CARD_FIELDS,
-  TEST_CARD_FIELDS,
-  TEST_STATUSES,
-  TESTING_CHECKLIST,
-  TESTING_ETHICS,
-  TESTING_INTRO,
-  TESTING_LENSES,
-  TESTING_REFERENCES,
-  TESTING_STEPS,
-  TESTING_WORKFLOW,
-} from '../data/testingLabData';
+import { getTestingLabContent } from '../data/testingLabData.en';
+import { useLanguage } from '../context/LanguageContext';
 import {
   exampleLab,
   extractHypothesesFromBmc,
@@ -75,6 +60,25 @@ function FieldGrid({ fields, values, onChange }) {
 }
 
 export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
+  const { lang, isEn } = useLanguage();
+  const {
+    CLASSIFICATION_NOTE,
+    DECISIONS,
+    EXPERIMENT_GROUPS,
+    EXPERIMENT_TYPES,
+    FIT_CHECKS,
+    LEARNING_CARD_FIELDS,
+    TEST_CARD_FIELDS,
+    TEST_STATUSES,
+    TESTING_CHECKLIST,
+    TESTING_ETHICS,
+    TESTING_INTRO,
+    TESTING_LENSES,
+    TESTING_REFERENCES,
+    TESTING_STEPS,
+    TESTING_WORKFLOW,
+  } = getTestingLabContent(lang);
+
   const [lab, setLab] = useState(() => loadLab(scope));
   const [testDraft, setTestDraft] = useState(EMPTY_TEST);
   const [learningDraft, setLearningDraft] = useState(EMPTY_LEARNING);
@@ -94,7 +98,7 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
     const card = {
       ...testDraft,
       id: testDraft.id || createItemId('test'),
-      name: testDraft.name.trim() || 'Kartu tes tanpa judul',
+      name: testDraft.name.trim() || (isEn ? 'Untitled test card' : 'Kartu tes tanpa judul'),
     };
     setLab((prev) => ({ ...prev, testCards: upsertById(prev.testCards, card) }));
     setTestDraft(EMPTY_TEST);
@@ -105,14 +109,14 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
     const card = {
       ...learningDraft,
       id: learningDraft.id || createItemId('learn'),
-      name: learningDraft.name.trim() || 'Kartu belajar tanpa judul',
+      name: learningDraft.name.trim() || (isEn ? 'Untitled learning card' : 'Kartu belajar tanpa judul'),
     };
     setLab((prev) => ({ ...prev, learningCards: upsertById(prev.learningCards, card) }));
     setLearningDraft(EMPTY_LEARNING);
   };
 
   const handleLoadExample = () => {
-    setLab(exampleLab(scope));
+    setLab(exampleLab(scope, lang));
     setTestDraft(EMPTY_TEST);
     setLearningDraft(EMPTY_LEARNING);
   };
@@ -125,8 +129,8 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
 
   const handleExtract = () => {
     const extracted = scope === 'bmc'
-      ? extractHypothesesFromBmc(bmcData)
-      : extractHypothesesFromVpd(canvas);
+      ? extractHypothesesFromBmc(bmcData, lang)
+      : extractHypothesesFromVpd(canvas, lang);
     if (!extracted.length) return;
     setLab((prev) => {
       const existingText = new Set(prev.assumptions.map((item) => item.text));
@@ -141,7 +145,9 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
     <div className="testing-lab">
       <div className="card" style={{ background: 'var(--ddk-white)', borderTop: '4px solid var(--ddk-gold)' }}>
         <span className="badge badge-gold" style={{ marginBottom: '0.4rem' }}>
-          {scope === 'bmc' ? 'Menguji Business Model Canvas' : 'Menguji Value Proposition Design'}
+          {scope === 'bmc'
+            ? (isEn ? 'Testing Business Model Canvas' : 'Menguji Business Model Canvas')
+            : (isEn ? 'Testing Value Proposition Design' : 'Menguji Value Proposition Design')}
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
           <FlaskConical size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
@@ -153,22 +159,26 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
         </p>
         <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginTop: '1rem' }}>
           <button type="button" className="btn btn-primary" onClick={handleLoadExample} style={{ fontSize: '0.8rem' }}>
-            <Sparkles size={14} /> Muat contoh ilustrasi Kartu Tes Kopi AJIB
+            <Sparkles size={14} /> {isEn ? 'Load Kopi AJIB Test Card illustration' : 'Muat contoh ilustrasi Kartu Tes Kopi AJIB'}
           </button>
           <button type="button" className="btn btn-outline" onClick={handleExtract} style={{ fontSize: '0.8rem' }}>
-            Turunkan hipotesis dari kanvas
+            {isEn ? 'Extract hypotheses from canvas' : 'Turunkan hipotesis dari kanvas'}
           </button>
           <button type="button" className="btn btn-outline" onClick={handleReset} style={{ fontSize: '0.8rem' }}>
-            <RotateCcw size={14} /> Reset catatan tes
+            <RotateCcw size={14} /> {isEn ? 'Reset test log' : 'Reset catatan tes'}
           </button>
         </div>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.55rem' }}>
-          Angka ambang, durasi, dan contoh Kopi AJIB di bagian ini adalah ilustrasi perencanaan, bukan patokan buku. Progres tersimpan otomatis di peramban ini.
+          {isEn
+            ? 'Thresholds, durations, and Kopi AJIB examples in this section are planning illustrations, not book benchmarks. Progress is saved automatically in this browser.'
+            : 'Angka ambang, durasi, dan contoh Kopi AJIB di bagian ini adalah ilustrasi perencanaan, bukan patokan buku. Progres tersimpan otomatis di peramban ini.'}
         </p>
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.75rem' }}>Tiga jenis hipotesis</h3>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.75rem' }}>
+          {isEn ? 'Three types of hypotheses' : 'Tiga jenis hipotesis'}
+        </h3>
         <div className="testing-grid-3">
           {TESTING_LENSES.map((lens) => (
             <article key={lens.id} style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '0.85rem' }}>
@@ -191,22 +201,30 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.4rem' }}>Asumsi paling berisiko</h3>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.4rem' }}>
+          {isEn ? 'Riskiest assumptions' : 'Asumsi paling berisiko'}
+        </h3>
         <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '0.75rem' }}>
-          Urutan di bawah memakai kepentingan × (6 − bukti): yang penting tetapi buktinya lemah muncul lebih dulu. Skala 1–5 adalah penilaian Anda, bukan skor resmi buku.
+          {isEn
+            ? 'The ranking below uses importance × (6 − evidence): critical assumptions backed by weak evidence surface first. The 1–5 scale is your own judgment, not an official book score.'
+            : 'Urutan di bawah memakai kepentingan × (6 − bukti): yang penting tetapi buktinya lemah muncul lebih dulu. Skala 1–5 adalah penilaian Anda, bukan skor resmi buku.'}
         </p>
         {ranked.length === 0 ? (
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Belum ada asumsi. Muat contoh atau turunkan hipotesis dari kanvas.</p>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+            {isEn
+              ? 'No assumptions yet. Load the illustration or extract hypotheses from the canvas.'
+              : 'Belum ada asumsi. Muat contoh atau turunkan hipotesis dari kanvas.'}
+          </p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table className="testing-risk-table">
               <thead>
                 <tr>
-                  <th>Asumsi</th>
-                  <th>Lensa</th>
-                  <th>Kepentingan</th>
-                  <th>Bukti</th>
-                  <th>Risiko</th>
+                  <th>{isEn ? 'Assumption' : 'Asumsi'}</th>
+                  <th>{isEn ? 'Lens' : 'Lensa'}</th>
+                  <th>{isEn ? 'Importance' : 'Kepentingan'}</th>
+                  <th>{isEn ? 'Evidence' : 'Bukti'}</th>
+                  <th>{isEn ? 'Risk' : 'Risiko'}</th>
                   <th> </th>
                 </tr>
               </thead>
@@ -222,7 +240,7 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
                       <td>{TESTING_LENSES.find((lens) => lens.id === item.lens)?.label}</td>
                       <td>
                         <select
-                          aria-label={`Kepentingan: ${item.text}`}
+                          aria-label={`${isEn ? 'Importance' : 'Kepentingan'}: ${item.text}`}
                           value={item.importance}
                           onChange={(event) => setLab((prev) => ({
                             ...prev,
@@ -234,7 +252,7 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
                       </td>
                       <td>
                         <select
-                          aria-label={`Bukti: ${item.text}`}
+                          aria-label={`${isEn ? 'Evidence' : 'Bukti'}: ${item.text}`}
                           value={item.evidence}
                           onChange={(event) => setLab((prev) => ({
                             ...prev,
@@ -246,14 +264,14 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
                       </td>
                       <td>
                         <strong>{score}</strong>
-                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{riskLabel(score)}</div>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{riskLabel(score, lang)}</div>
                       </td>
                       <td>
                         <button
                           type="button"
                           onClick={() => setLab((prev) => ({ ...prev, assumptions: removeById(prev.assumptions, item.id) }))}
                           style={{ background: 'none', border: 0, color: 'var(--text-muted)', cursor: 'pointer' }}
-                          aria-label={`Hapus asumsi ${item.text}`}
+                          aria-label={isEn ? `Remove assumption ${item.text}` : `Hapus asumsi ${item.text}`}
                         >
                           <Trash2 size={13} />
                         </button>
@@ -268,26 +286,44 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.4rem' }}>Kartu Tes</h3>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.4rem' }}>
+          {isEn ? 'Test Card' : 'Kartu Tes'}
+        </h3>
         <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '0.75rem' }}>
-          Empat kolom resmi Strategyzer diisi sebelum eksperimen. Status akhirnya adalah didukung, tidak didukung, atau belum konklusif — bukan “terbukti selamanya”.
+          {isEn
+            ? 'Complete the four official Strategyzer fields before running an experiment. Final outcomes are supported, not supported, or inconclusive — never "proven forever."'
+            : 'Empat kolom resmi Strategyzer diisi sebelum eksperimen. Status akhirnya adalah didukung, tidak didukung, atau belum konklusif — bukan “terbukti selamanya”.'}
         </p>
         <div className="testing-form" style={{ marginBottom: '0.75rem' }}>
           <label>
-            Judul kartu
-            <input value={testDraft.name} onChange={(event) => setTestField('name', event.target.value)} aria-label="Judul kartu tes" />
+            {isEn ? 'Card title' : 'Judul kartu'}
+            <input
+              value={testDraft.name}
+              onChange={(event) => setTestField('name', event.target.value)}
+              aria-label={isEn ? 'Test card title' : 'Judul kartu tes'}
+            />
           </label>
         </div>
         <div className="testing-grid-2" style={{ marginBottom: '0.75rem' }}>
           <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ddk-dark)' }}>
-            Lensa
-            <select value={testDraft.lens} onChange={(event) => setTestField('lens', event.target.value)} aria-label="Lensa kartu tes" style={{ marginTop: '0.25rem', width: '100%', padding: '0.45rem 0.55rem' }}>
+            {isEn ? 'Lens' : 'Lensa'}
+            <select
+              value={testDraft.lens}
+              onChange={(event) => setTestField('lens', event.target.value)}
+              aria-label={isEn ? 'Test card lens' : 'Lensa kartu tes'}
+              style={{ marginTop: '0.25rem', width: '100%', padding: '0.45rem 0.55rem' }}
+            >
               {TESTING_LENSES.map((lens) => <option key={lens.id} value={lens.id}>{lens.label}</option>)}
             </select>
           </label>
           <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ddk-dark)' }}>
             Status
-            <select value={testDraft.status} onChange={(event) => setTestField('status', event.target.value)} aria-label="Status kartu tes" style={{ marginTop: '0.25rem', width: '100%', padding: '0.45rem 0.55rem' }}>
+            <select
+              value={testDraft.status}
+              onChange={(event) => setTestField('status', event.target.value)}
+              aria-label={isEn ? 'Test card status' : 'Status kartu tes'}
+              style={{ marginTop: '0.25rem', width: '100%', padding: '0.45rem 0.55rem' }}
+            >
               {TEST_STATUSES.map((status) => <option key={status.id} value={status.id}>{status.label}</option>)}
             </select>
           </label>
@@ -295,20 +331,32 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
         <FieldGrid fields={TEST_CARD_FIELDS} values={testDraft} onChange={setTestField} />
         <div className="testing-grid-3" style={{ margin: '0.75rem 0' }}>
           <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ddk-dark)' }}>
-            Perkiraan biaya
-            <input value={testDraft.cost} onChange={(event) => setTestField('cost', event.target.value)} aria-label="Perkiraan biaya tes" />
+            {isEn ? 'Estimated cost' : 'Perkiraan biaya'}
+            <input
+              value={testDraft.cost}
+              onChange={(event) => setTestField('cost', event.target.value)}
+              aria-label={isEn ? 'Estimated test cost' : 'Perkiraan biaya tes'}
+            />
           </label>
           <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ddk-dark)' }}>
-            Durasi
-            <input value={testDraft.duration} onChange={(event) => setTestField('duration', event.target.value)} aria-label="Durasi tes" />
+            {isEn ? 'Duration' : 'Durasi'}
+            <input
+              value={testDraft.duration}
+              onChange={(event) => setTestField('duration', event.target.value)}
+              aria-label={isEn ? 'Test duration' : 'Durasi tes'}
+            />
           </label>
           <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ddk-dark)' }}>
-            Penanggung jawab
-            <input value={testDraft.owner} onChange={(event) => setTestField('owner', event.target.value)} aria-label="Penanggung jawab tes" />
+            {isEn ? 'Owner' : 'Penanggung jawab'}
+            <input
+              value={testDraft.owner}
+              onChange={(event) => setTestField('owner', event.target.value)}
+              aria-label={isEn ? 'Test owner' : 'Penanggung jawab tes'}
+            />
           </label>
         </div>
         <button type="button" className="btn btn-primary" onClick={handleSaveTest} style={{ fontSize: '0.8rem' }}>
-          Simpan Kartu Tes
+          {isEn ? 'Save Test Card' : 'Simpan Kartu Tes'}
         </button>
         <div className="testing-card-list" style={{ marginTop: '1rem' }}>
           {lab.testCards.map((card) => (
@@ -317,13 +365,25 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
                 <strong style={{ color: 'var(--ddk-dark)' }}>{card.name}</strong>
                 <span className="badge badge-soft">{TEST_STATUSES.find((status) => status.id === card.status)?.label} · {TESTING_LENSES.find((lens) => lens.id === card.lens)?.label}</span>
               </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.45rem' }}><strong>Hipotesis.</strong> {card.hypothesis}</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}><strong>Tes.</strong> {card.experiment}</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}><strong>Metrik.</strong> {card.metric}</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}><strong>Kriteria.</strong> {card.criteria}</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.45rem' }}>
+                <strong>{isEn ? 'Hypothesis.' : 'Hipotesis.'}</strong> {card.hypothesis}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}>
+                <strong>{isEn ? 'Test.' : 'Tes.'}</strong> {card.experiment}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}>
+                <strong>{isEn ? 'Metric.' : 'Metrik.'}</strong> {card.metric}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}>
+                <strong>{isEn ? 'Criteria.' : 'Kriteria.'}</strong> {card.criteria}
+              </p>
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.55rem' }}>
-                <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem' }} onClick={() => setTestDraft(card)}>Ubah</button>
-                <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem' }} onClick={() => setLab((prev) => ({ ...prev, testCards: removeById(prev.testCards, card.id) }))}>Hapus</button>
+                <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem' }} onClick={() => setTestDraft(card)}>
+                  {isEn ? 'Edit' : 'Ubah'}
+                </button>
+                <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem' }} onClick={() => setLab((prev) => ({ ...prev, testCards: removeById(prev.testCards, card.id) }))}>
+                  {isEn ? 'Delete' : 'Hapus'}
+                </button>
               </div>
             </article>
           ))}
@@ -331,9 +391,13 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.4rem' }}>Jenis eksperimen</h3>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.4rem' }}>
+          {isEn ? 'Experiment types' : 'Jenis eksperimen'}
+        </h3>
         <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '0.75rem' }}>
-          Kekuatan bukti, biaya, durasi, dan ambang di bawah adalah ilustrasi perencanaan, bukan rating resmi buku. Wawancara misalnya bisa kuat untuk memahami konteks, tetapi lemah untuk membuktikan pembelian.
+          {isEn
+            ? 'Evidence strength, cost, duration, and thresholds below are planning illustrations, not official book ratings. Interviews, for instance, can be strong for understanding context yet weak for proving purchase intent.'
+            : 'Kekuatan bukti, biaya, durasi, dan ambang di bawah adalah ilustrasi perencanaan, bukan rating resmi buku. Wawancara misalnya bisa kuat untuk memahami konteks, tetapi lemah untuk membuktikan pembelian.'}
         </p>
         {EXPERIMENT_GROUPS.map((group) => (
           <div key={group.id} style={{ marginBottom: '0.85rem' }}>
@@ -366,11 +430,11 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
                     {open && (
                       <div style={{ padding: '0 0.85rem 0.85rem', background: 'var(--ddk-light-gray)', fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.6 }}>
                         <p>{item.body}</p>
-                        <p style={{ marginTop: '0.4rem' }}><strong>Risiko yang diuji.</strong> {item.risk}</p>
-                        <p style={{ marginTop: '0.3rem' }}><strong>Kekuatan bukti.</strong> {item.evidence}</p>
-                        <p style={{ marginTop: '0.3rem' }}><strong>Biaya dan waktu.</strong> {item.costTime}</p>
-                        <p style={{ marginTop: '0.3rem' }}><strong>Metrik.</strong> {item.metric}</p>
-                        <p style={{ marginTop: '0.3rem', color: 'var(--text-secondary)' }}><strong>Sumber.</strong> {item.source}</p>
+                        <p style={{ marginTop: '0.4rem' }}><strong>{isEn ? 'Risk tested.' : 'Risiko yang diuji.'}</strong> {item.risk}</p>
+                        <p style={{ marginTop: '0.3rem' }}><strong>{isEn ? 'Evidence strength.' : 'Kekuatan bukti.'}</strong> {item.evidence}</p>
+                        <p style={{ marginTop: '0.3rem' }}><strong>{isEn ? 'Cost and time.' : 'Biaya dan waktu.'}</strong> {item.costTime}</p>
+                        <p style={{ marginTop: '0.3rem' }}><strong>{isEn ? 'Metric.' : 'Metrik.'}</strong> {item.metric}</p>
+                        <p style={{ marginTop: '0.3rem', color: 'var(--text-secondary)' }}><strong>{isEn ? 'Source.' : 'Sumber.'}</strong> {item.source}</p>
                       </div>
                     )}
                   </div>
@@ -383,32 +447,48 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.4rem' }}>Kartu Belajar</h3>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.4rem' }}>
+          {isEn ? 'Learning Card' : 'Kartu Belajar'}
+        </h3>
         <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '0.75rem' }}>
-          Isi setelah eksperimen. Simpan juga hasil yang tidak mendukung ide, termasuk batas pengamatan.
+          {isEn
+            ? 'Complete after the experiment. Record results that disconfirm your idea too, including observation limits.'
+            : 'Isi setelah eksperimen. Simpan juga hasil yang tidak mendukung ide, termasuk batas pengamatan.'}
         </p>
         <div className="testing-form" style={{ marginBottom: '0.75rem' }}>
           <label>
-            Judul kartu
-            <input value={learningDraft.name} onChange={(event) => setLearningField('name', event.target.value)} aria-label="Judul kartu belajar" />
+            {isEn ? 'Card title' : 'Judul kartu'}
+            <input
+              value={learningDraft.name}
+              onChange={(event) => setLearningField('name', event.target.value)}
+              aria-label={isEn ? 'Learning card title' : 'Judul kartu belajar'}
+            />
           </label>
           <label>
-            Tertaut ke Kartu Tes
-            <select value={learningDraft.testCardId} onChange={(event) => setLearningField('testCardId', event.target.value)} aria-label="Tautan kartu tes">
-              <option value="">Tidak ditautkan</option>
+            {isEn ? 'Linked to Test Card' : 'Tertaut ke Kartu Tes'}
+            <select
+              value={learningDraft.testCardId}
+              onChange={(event) => setLearningField('testCardId', event.target.value)}
+              aria-label={isEn ? 'Linked test card' : 'Tautan kartu tes'}
+            >
+              <option value="">{isEn ? 'Not linked' : 'Tidak ditautkan'}</option>
               {lab.testCards.map((card) => <option key={card.id} value={card.id}>{card.name}</option>)}
             </select>
           </label>
         </div>
         <FieldGrid fields={LEARNING_CARD_FIELDS} values={learningDraft} onChange={setLearningField} />
         <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--ddk-dark)', margin: '0.75rem 0' }}>
-          Keputusan
-          <select value={learningDraft.decision} onChange={(event) => setLearningField('decision', event.target.value)} aria-label="Keputusan kartu belajar">
+          {isEn ? 'Decision' : 'Keputusan'}
+          <select
+            value={learningDraft.decision}
+            onChange={(event) => setLearningField('decision', event.target.value)}
+            aria-label={isEn ? 'Learning card decision' : 'Keputusan kartu belajar'}
+          >
             {DECISIONS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
           </select>
         </label>
         <button type="button" className="btn btn-primary" onClick={handleSaveLearning} style={{ fontSize: '0.8rem' }}>
-          Simpan Kartu Belajar
+          {isEn ? 'Save Learning Card' : 'Simpan Kartu Belajar'}
         </button>
         <div className="testing-card-list" style={{ marginTop: '1rem' }}>
           {lab.learningCards.map((card) => (
@@ -417,13 +497,25 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
                 <strong style={{ color: 'var(--ddk-dark)' }}>{card.name}</strong>
                 <span className="badge badge-soft">{DECISIONS.find((item) => item.id === card.decision)?.label}</span>
               </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.45rem' }}><strong>Dugaan.</strong> {card.believed}</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}><strong>Pengamatan.</strong> {card.observed}</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}><strong>Pelajaran.</strong> {card.learned}</p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}><strong>Tindakan.</strong> {card.decisionNote}</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.45rem' }}>
+                <strong>{isEn ? 'Hypothesis.' : 'Dugaan.'}</strong> {card.believed}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}>
+                <strong>{isEn ? 'Observation.' : 'Pengamatan.'}</strong> {card.observed}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}>
+                <strong>{isEn ? 'Learnings.' : 'Pelajaran.'}</strong> {card.learned}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.55, marginTop: '0.3rem' }}>
+                <strong>{isEn ? 'Actions.' : 'Tindakan.'}</strong> {card.decisionNote}
+              </p>
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.55rem' }}>
-                <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem' }} onClick={() => setLearningDraft(card)}>Ubah</button>
-                <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem' }} onClick={() => setLab((prev) => ({ ...prev, learningCards: removeById(prev.learningCards, card.id) }))}>Hapus</button>
+                <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem' }} onClick={() => setLearningDraft(card)}>
+                  {isEn ? 'Edit' : 'Ubah'}
+                </button>
+                <button type="button" className="btn btn-outline" style={{ fontSize: '0.72rem' }} onClick={() => setLab((prev) => ({ ...prev, learningCards: removeById(prev.learningCards, card.id) }))}>
+                  {isEn ? 'Delete' : 'Hapus'}
+                </button>
               </div>
             </article>
           ))}
@@ -431,11 +523,15 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.75rem' }}>Cek tiga tingkat kecocokan</h3>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.75rem' }}>
+          {isEn ? 'Checking the three levels of fit' : 'Cek tiga tingkat kecocokan'}
+        </h3>
         <div className="testing-grid-3">
-          {FIT_CHECKS.map((item) => (
+          {FIT_CHECKS.map((item, idx) => (
             <article key={item.id} style={{ border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '0.85rem' }}>
-              <span className="badge badge-soft" style={{ marginBottom: '0.35rem' }}>{item.idLabel}</span>
+              <span className="badge badge-soft" style={{ marginBottom: '0.35rem' }}>
+                {isEn ? `Stage ${idx + 1}` : item.idLabel}
+              </span>
               <h4 style={{ fontSize: '0.95rem', color: 'var(--ddk-dark)' }}>{item.title}</h4>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-body)', lineHeight: 1.6, marginTop: '0.4rem' }}>{item.how}</p>
             </article>
@@ -444,8 +540,14 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
       </div>
 
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.35rem' }}>Daftar periksa</h3>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.7rem' }}>{checkedCount} dari {TESTING_CHECKLIST.length} butir ditandai.</p>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', marginBottom: '0.35rem' }}>
+          {isEn ? 'Testing checklist' : 'Daftar periksa'}
+        </h3>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.7rem' }}>
+          {isEn
+            ? `${checkedCount} of ${TESTING_CHECKLIST.length} items checked.`
+            : `${checkedCount} dari ${TESTING_CHECKLIST.length} butir ditandai.`}
+        </p>
         <ul className="testing-checklist">
           {TESTING_CHECKLIST.map((item) => (
             <li key={item.id}>
@@ -470,7 +572,9 @@ export function TestingLab({ scope = 'vpd', canvas = null, bmcData = null }) {
       <div className="card" style={{ background: 'var(--bg-surface)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
           <Quote size={18} color="var(--ddk-primary-blue)" aria-hidden="true" />
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', margin: 0 }}>Referensi pengujian</h3>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ddk-dark)', margin: 0 }}>
+            {isEn ? 'Testing references' : 'Referensi pengujian'}
+          </h3>
         </div>
         <ul style={{ paddingLeft: '1.15rem', display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
           {TESTING_REFERENCES.map((ref) => (

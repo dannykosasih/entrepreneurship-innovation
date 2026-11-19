@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { KNOWLEDGE_BASE } from '../data/knowledgeBaseData';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   Search, 
   BookOpen, 
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react';
 
 export function KnowledgeHub() {
+  const { isEn } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -37,7 +39,9 @@ export function KnowledgeHub() {
               Core Frameworks & Concepts Wiki
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', marginTop: '0.2rem' }}>
-              Kumpulan teori fundamental, model ekonomi, rumus unit economics, dan keunggulan kompetitif.
+              {isEn
+                ? 'A curated collection of fundamental theories, economic models, unit economics formulas, and competitive advantage frameworks.'
+                : 'Kumpulan teori fundamental, model ekonomi, rumus unit economics, dan keunggulan kompetitif.'}
             </p>
           </div>
 
@@ -55,7 +59,7 @@ export function KnowledgeHub() {
             <Search size={16} color="var(--ddk-primary-blue)" />
             <input
               type="text"
-              placeholder="Cari konsep, rumus, nama ahli..."
+              placeholder={isEn ? 'Search concepts, formulas, authors...' : 'Cari konsep, rumus, nama ahli...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -158,11 +162,13 @@ export function KnowledgeHub() {
                 color: 'var(--ddk-dark)',
                 marginBottom: '0.5rem'
               }}>
-                <strong style={{ fontFamily: 'var(--font-heading)' }}>Contoh Riil Indonesia:</strong> {item.example}
+                <strong style={{ fontFamily: 'var(--font-heading)' }}>
+                  {isEn ? 'Real-World Indonesian Example:' : 'Contoh Riil Indonesia:'}
+                </strong> {item.example}
               </div>
 
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                <strong>Dampak Strategis:</strong> {item.importance}
+                <strong>{isEn ? 'Strategic Impact:' : 'Dampak Strategis:'}</strong> {item.importance}
               </div>
             </div>
           </div>
