@@ -11,18 +11,18 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve static assets with Nginx on Cloud Run ($PORT, defaults to 8080)
-FROM nginx:alpine
+# Stage 2: Serve static assets + Gemini proxy (/api/chat) with a dependency-free Node server.
+# Cloud Run sets $PORT (default 8080). Set GEMINI_API_KEY as a Cloud Run env var / secret.
+FROM node:24-alpine
 
-# Remove default nginx config and add SPA template config
-RUN rm -rf /etc/nginx/conf.d/*
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+WORKDIR /app
+ENV NODE_ENV=production PORT=8080
 
-# Copy compiled static files from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY package.json ./
+COPY --from=builder /app/dist ./dist
+COPY server ./server
 
-# Cloud Run sets PORT environment variable (default 8080)
-ENV PORT=8080
+USER node
 EXPOSE 8080
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", "server/server.js"]

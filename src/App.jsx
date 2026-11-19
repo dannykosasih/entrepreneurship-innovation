@@ -12,6 +12,7 @@ import { KnowledgeHub } from './components/KnowledgeHub';
 import { SourcesReading } from './components/SourcesReading';
 import { GradesDashboard } from './components/GradesDashboard';
 import { CertificateModal } from './components/CertificateModal';
+import { AiAssistant } from './components/AiAssistant';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { COURSES } from './data/coursesData';
 import './neon.css';
@@ -140,6 +141,7 @@ export default function App() {
     <LanguageProvider>
     <div className="neon-app" data-design="neon-nights" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
       <SkipLink />
+      <AiAssistant activeTab={activeTab} selectedCourseId={selectedCourseId} />
       <Navbar
         menuOpen={menuOpen}
         onToggleMenu={() => setMenuOpen(open => !open)}
